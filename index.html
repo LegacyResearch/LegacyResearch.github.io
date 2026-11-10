@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legacy Research — Site (teste)</title>
+<meta name="description" content="Laboratório independente de pesquisa macroeconômica: dados, método aberto e erros à vista.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0B0D10; --card:#151920; --line:#1E232B; --text:#F4F6F8; --sub:#C3CAD4; --mut:#8A94A3; --acc:#3D7BFF; --acc-h:#5B8CFF; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:Inter, system-ui, sans-serif; line-height:1.6; }
+  .wrap { max-width:960px; margin:0 auto; padding:0 24px; }
+  .acc { color:var(--acc); }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; overflow:hidden; display:flex; flex-direction:column; border-bottom:1px solid var(--line); }
+  #scene { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(180deg, rgba(11,13,16,.94) 0%, rgba(11,13,16,.6) 36%, rgba(11,13,16,0) 60%); }
+  .hero-inner { position:relative; z-index:2; width:100%; padding-top:28px; padding-bottom:40px; }
+  .brand { display:flex; align-items:center; gap:12px; margin-bottom:clamp(24px, 5vh, 56px); }
+  .brand span { font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:21px; }
+  h1 { font-family:'Space Grotesk', sans-serif; font-size:clamp(36px, 7vw, 72px); line-height:1.03; letter-spacing:-1.5px; margin:0 0 16px; max-width:760px; }
+  .lead { font-size:clamp(16px, 2.2vw, 20px); color:var(--sub); max-width:540px; margin:0 0 24px; }
+  .btns { display:flex; flex-wrap:wrap; gap:10px; }
+  .btn { display:inline-flex; align-items:center; min-height:46px; padding:0 20px; border-radius:999px; font-weight:600; font-size:15px; text-decoration:none; border:1px solid #2A303A; color:var(--text); background:rgba(11,13,16,.65); }
+  .btn:hover { border-color:var(--acc); }
+  .btn.primary { background:var(--acc); border-color:var(--acc); color:#fff; }
+  .btn.primary:hover { background:var(--acc-h); }
+  .scroll { position:absolute; z-index:2; left:0; right:0; bottom:16px; text-align:center; font-size:12px; letter-spacing:3px; color:var(--mut); text-decoration:none; }
+
+  section { padding:64px 0; border-bottom:1px solid var(--line); }
+  .kick { font-size:13px; font-weight:600; letter-spacing:3px; color:var(--acc); margin:0 0 10px; }
+  h2 { font-family:'Space Grotesk', sans-serif; font-size:clamp(28px, 4vw, 38px); line-height:1.15; margin:0 0 20px; }
+  p { margin:0 0 14px; color:var(--sub); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+  .card { background:var(--card); border-radius:14px; padding:24px; transition:transform .25s ease; }
+  .card:hover { transform:translateY(-4px); }
+  .card h3 { font-family:'Space Grotesk', sans-serif; font-size:22px; margin:0 0 8px; }
+  .card p { font-size:15px; margin:0; }
+  .card p.kick { margin-bottom:10px; font-size:13px; }
+  .card.hl { background:var(--acc); }
+  .card.hl .kick, .card.hl p { color:#fff; }
+  .pillars { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:24px; margin-top:28px; }
+  .pillars div { border-top:3px solid var(--acc); padding-top:16px; }
+  .pillars b { display:block; font-family:'Space Grotesk', sans-serif; font-size:26px; margin-bottom:4px; }
+  .pillars span { color:var(--sub); font-size:15px; }
+  footer { padding:40px 0 56px; font-size:14px; }
+  footer p { color:var(--mut); }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .card { transition:none; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <div class="brand">
+      <svg width="42" height="42" viewBox="0 0 100 100" role="img" aria-label="Logo Legacy Research">
+        <polygon points="30,12 40,27 58,24 73,31 88,43 93,50 87,58 73,64 54,70 38,90 16,84 18,44 23,29" fill="#3D7BFF"/>
+        <polygon points="66,37 77,39 72,43" fill="#0B0D10"/>
+        <path d="M73,43 Q76,52 82,59" stroke="#0B0D10" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+        <polygon points="87,44 94,50 87,52" fill="#0B0D10"/>
+        <g fill="#0B0D10"><circle cx="42" cy="38" r="2.6"/><circle cx="51" cy="31" r="2.2"/><circle cx="33" cy="52" r="2.8"/><circle cx="45" cy="50" r="2.2"/><circle cx="28" cy="68" r="2.8"/><circle cx="40" cy="64" r="2.2"/></g>
+      </svg>
+      <span>Legacy <span class="acc">Research</span></span>
+    </div>
+    <h1>Dados. Método aberto. Erros à vista.</h1>
+    <p class="lead">Laboratório independente de pesquisa macroeconômica. Juros, inflação, atividade, contas públicas e câmbio, no Brasil e no mundo.</p>
+    <div class="btns">
+      <a class="btn primary" href="https://www.linkedin.com/company/legacyresearch/" target="_blank" rel="noopener">Siga no LinkedIn</a>
+      <a class="btn" href="https://github.com/LegacyResearch" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <a class="scroll" href="#sobre">CONHEÇA ↓</a>
+</header>
+
+<section id="sobre">
+  <div class="wrap">
+    <p class="kick">QUEM SOMOS</p>
+    <h2>Pesquisa feita com dados, não com opinião</h2>
+    <p>Toda análise parte de dados oficiais (Banco Central, IBGE, B3, Tesouro e fontes internacionais), com código aberto para qualquer pessoa conferir os números.</p>
+    <p>Registramos nossas previsões com data e publicamos um placar trimestral de acertos e erros. Quando erramos, explicamos por quê.</p>
+    <div class="pillars">
+      <div><b>Dados</b><span>Séries oficiais, com fonte e data de consulta.</span></div>
+      <div><b>Aberto</b><span>Código no GitHub: qualquer um refaz a conta.</span></div>
+      <div><b>Auditável</b><span>Previsões registradas antes do resultado.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kick">O QUE PUBLICAMOS</p>
+    <h2>Três formatos, cada um com uma função</h2>
+    <div class="grid">
+      <div class="card">
+        <p class="kick">TODA SEGUNDA</p>
+        <h3>Semana em análise</h3>
+        <p>Os números, os pregões dia a dia, Brasil, EUA, mundo e câmbio, e o que tudo isso significa junto.</p>
+      </div>
+      <div class="card">
+        <p class="kick">MENSAL</p>
+        <h3>Tese do mês</h3>
+        <p>Cenários, o que o mercado já precifica e o que invalidaria a leitura.</p>
+      </div>
+      <div class="card hl">
+        <p class="kick">TRIMESTRAL</p>
+        <h3>Placar</h3>
+        <p>Nossas previsões, registradas com data, contra o que aconteceu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Conteúdo educacional. Não fazemos recomendação de investimentos.</p>
+    <p>© 2026 Legacy Research · Projeto independente</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var canvas = document.getElementById('scene');
+  if (!window.THREE) { canvas.style.display = 'none'; return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); }
+  catch (e) { canvas.style.display = 'none'; return; }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BG = 0x0B0D10, BLUE = 0x3D7BFF, DARK = 0x0B0D10;
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(BG, 14, 36);
+  var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.95); sun.position.set(6, 7, 6); scene.add(sun);
+  var rim = new THREE.PointLight(BLUE, 1.4, 20); rim.position.set(-5, 3, -3); scene.add(rim);
+
+  // ---------- chão em grade ----------
+  var CELL = 2;
+  var grid = new THREE.GridHelper(80, 40, 0x2F559A, 0x232B38);
+  scene.add(grid);
+
+  // ---------- guepardo low-poly ----------
+  var mBody = new THREE.MeshStandardMaterial({ color: BLUE, flatShading: true, roughness: 0.55, metalness: 0.1 });
+  var mDark = new THREE.MeshStandardMaterial({ color: DARK, flatShading: true, roughness: 0.9 });
+  var cheetah = new THREE.Group(); scene.add(cheetah);
+  function box(w, h, d, mat, x, y, z, parent) {
+    var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x || 0, y || 0, z || 0); (parent || cheetah).add(m); return m;
+  }
+  var torso = new THREE.Group(); cheetah.add(torso);
+  box(2.0, 0.5, 0.42, mBody, 0, 1.15, 0, torso);
+  box(0.75, 0.66, 0.5, mBody, 0.72, 1.17, 0, torso);
+  box(0.62, 0.58, 0.46, mBody, -0.78, 1.16, 0, torso);
+  var neck = box(0.5, 0.34, 0.32, mBody, 1.2, 1.42, 0, torso); neck.rotation.z = 0.55;
+  var head = new THREE.Group(); head.position.set(1.52, 1.6, 0); torso.add(head);
+  box(0.5, 0.36, 0.36, mBody, 0, 0, 0, head);
+  box(0.28, 0.2, 0.24, mBody, 0.34, -0.07, 0, head);
+  box(0.07, 0.07, 0.25, mDark, 0.48, -0.03, 0, head);
+  [-1, 1].forEach(function (s) {
+    box(0.09, 0.15, 0.1, mBody, -0.14, 0.24, 0.12 * s, head);
+    box(0.08, 0.07, 0.02, mDark, 0.12, 0.05, 0.185 * s, head);
+    var tear = box(0.04, 0.24, 0.02, mDark, 0.2, -0.08, 0.185 * s, head); tear.rotation.z = 0.5;
+  });
+  var spots = [[-0.9,1.3],[-0.6,1.05],[-0.45,1.32],[-0.2,1.12],[0.0,1.3],[0.22,1.05],[0.4,1.3],[0.62,1.0],[0.8,1.36],[-0.75,1.02],[0.95,1.12],[-0.1,0.98]];
+  spots.forEach(function (p, i) {
+    [-1, 1].forEach(function (s) {
+      var zz = (p[0] > 0.35) ? 0.255 : (p[0] < -0.45 ? 0.235 : 0.215);
+      box(0.1 + (i % 3) * 0.02, 0.09, 0.02, mDark, p[0], p[1], zz * s, torso);
+    });
+  });
+  var tail = new THREE.Group(); tail.position.set(-1.05, 1.28, 0); torso.add(tail);
+  box(0.8, 0.1, 0.1, mBody, -0.4, 0, 0, tail);
+  var tail2 = new THREE.Group(); tail2.position.set(-0.8, 0, 0); tail.add(tail2);
+  box(0.5, 0.09, 0.09, mBody, -0.25, 0, 0, tail2);
+  box(0.22, 0.1, 0.1, mDark, -0.6, 0, 0, tail2);
+  function leg(x, z, front) {
+    var hip = new THREE.Group(); hip.position.set(x, 0.98, z); cheetah.add(hip);
+    box(0.17, 0.56, 0.16, mBody, 0, -0.26, 0, hip);
+    var knee = new THREE.Group(); knee.position.set(0, -0.52, 0); hip.add(knee);
+    box(0.12, 0.52, 0.12, mBody, 0, -0.24, 0, knee);
+    box(0.2, 0.08, 0.14, mDark, 0.04, -0.5, 0, knee);
+    return { hip: hip, knee: knee, front: front };
+  }
+  var legs = [leg(0.82, 0.19, true), leg(0.82, -0.19, true), leg(-0.82, 0.19, false), leg(-0.82, -0.19, false)];
+
+  function pose(p) {
+    var bounce = Math.abs(Math.sin(p)) * 0.14;
+    legs.forEach(function (l, i) {
+      var ph = p + (l.front ? 0 : Math.PI * 0.9) + (i % 2 ? 0.4 : 0);
+      l.hip.rotation.z = Math.sin(ph) * (l.front ? 0.95 : 0.85) + (l.front ? 0.1 : -0.1);
+      var bend = Math.max(0, Math.cos(ph + 0.6)) * 1.25;
+      l.knee.rotation.z = l.front ? -bend : bend;
+      l.hip.position.y = 0.98 + bounce;
+    });
+    torso.position.y = bounce;
+    torso.rotation.z = Math.sin(p * 2 + 0.6) * 0.05;
+    head.rotation.z = -torso.rotation.z * 1.4;
+    tail.rotation.z = 0.15 + Math.sin(p * 2) * 0.16;
+    tail2.rotation.z = 0.25 + Math.sin(p * 2 - 0.9) * 0.22;
+  }
+
+  // ---------- linhas de gráfico nascendo atrás do guepardo ----------
+  var MAXP = 170, STEP = 0.42, ORIGIN = -1.9, END = -64;
+  function next(s) {
+    s.y += (Math.random() - 0.47) * s.vol + (s.base - s.y) * 0.04;
+    s.y = Math.min(3.4, Math.max(0.35, s.y));
+    return s.y;
+  }
+  function makeSeries(z, color, base, vol, lineOp, fillOp, dot) {
+    var pos = new Float32Array(MAXP * 3);
+    var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    var line = new THREE.Line(lg, new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: lineOp }));
+    var fpos = new Float32Array(MAXP * 6), idx = [];
+    for (var i = 0; i < MAXP - 1; i++) { var a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    var fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.BufferAttribute(fpos, 3)); fg.setIndex(idx);
+    var fill = new THREE.Mesh(fg, new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: fillOp, side: THREE.DoubleSide, depthWrite: false }));
+    line.frustumCulled = false; fill.frustumCulled = false;
+    var g = new THREE.Group(); g.add(fill); g.add(line); scene.add(g);
+    var s = { g: g, z: z, base: base, vol: vol, y: base, pts: [], line: line, fill: fill, pos: pos, fpos: fpos, dot: null };
+    s.pts.push({ x: ORIGIN, y: next(s) });   // a linha nasce junto com a corrida
+    s.target = next(s);
+    if (dot) {
+      s.dot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), new THREE.MeshBasicMaterial({ color: 0xF4F6F8 }));
+      g.add(s.dot);
+    }
+    return s;
+  }
+  function put(s, i, x, y) {
+    s.pos[i * 3] = x; s.pos[i * 3 + 1] = y; s.pos[i * 3 + 2] = s.z;
+    s.fpos[i * 6] = x; s.fpos[i * 6 + 1] = y; s.fpos[i * 6 + 2] = s.z;
+    s.fpos[i * 6 + 3] = x; s.fpos[i * 6 + 4] = 0; s.fpos[i * 6 + 5] = s.z;
+  }
+  function writeSeries(s) {
+    var f = Math.min(1, Math.max(0, (ORIGIN - s.pts[0].x) / STEP));
+    var hy = s.pts[0].y + (s.target - s.pts[0].y) * f;
+    put(s, 0, ORIGIN, hy);                       // ponta viva da linha
+    var n = Math.min(s.pts.length, MAXP - 1);
+    for (var i = 0; i < n; i++) put(s, i + 1, s.pts[i].x, s.pts[i].y);
+    n += 1;
+    s.line.geometry.setDrawRange(0, n); s.line.geometry.attributes.position.needsUpdate = true;
+    s.fill.geometry.setDrawRange(0, (n - 1) * 6); s.fill.geometry.attributes.position.needsUpdate = true;
+    if (s.dot) s.dot.position.set(ORIGIN, hy, s.z);
+  }
+  function advance(s, dx) {
+    for (var i = 0; i < s.pts.length; i++) s.pts[i].x -= dx;
+    while (s.pts[0].x <= ORIGIN - STEP) { s.pts.unshift({ x: s.pts[0].x + STEP, y: s.target }); s.target = next(s); }
+    while (s.pts.length > 2 && s.pts[s.pts.length - 1].x < END) s.pts.pop();
+    writeSeries(s);
+  }
+  var series = [
+    makeSeries(0, 0x3D7BFF, 1.2, 0.3, 1, 0.14, true),
+    makeSeries(-2.2, 0x9DBBFF, 1.9, 0.24, 0.75, 0.06, false),
+    makeSeries(-4.6, 0xF4F6F8, 2.6, 0.26, 0.45, 0.03, false)
+  ];
+  series.forEach(writeSeries);
+
+  // ---------- câmera e tamanho ----------
+  var look = new THREE.Vector3(), base = [0, 0, 0], mx = 0, my = 0;
+  function resize() {
+    var w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    var narrow = camera.aspect < 0.9;
+    camera.fov = narrow ? 62 : 42;
+    camera.updateProjectionMatrix();
+    series.forEach(function (s) { s.g.position.x = cheetah.position.x; });
+    base = narrow ? [0, 2.6, 13] : [6.4, 2.6, 8.2];
+    look.set(narrow ? 0 : 0.4, narrow ? 3.3 : 2.0, 0);
+  }
+  window.addEventListener('resize', resize); resize();
+  window.addEventListener('pointermove', function (e) {
+    mx = (e.clientX / window.innerWidth - 0.5); my = (e.clientY / window.innerHeight - 0.5);
+  });
+
+  // corrida única: o guepardo cruza a tela e some; ficam só as linhas
+  var RUN = 30, DRIFT = 1.1, X0 = -22, X1 = 24, WAIT = 0.5;
+  var last = performance.now(), phase = 0, visible = true, running = true, wait = WAIT;
+  cheetah.position.x = X0;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }).observe(canvas);
+  }
+  camera.position.set(base[0], base[1], base[2]);
+  function step(dt) {
+    var dx;
+    if (wait > 0) { wait -= dt; dx = 0; }
+    else if (running) {
+      phase += dt * 26; pose(phase);
+      dx = RUN * dt; cheetah.position.x += dx;
+      if (cheetah.position.x >= X1) { running = false; cheetah.visible = false; }
+    } else dx = DRIFT * dt;
+    series.forEach(function (s) { s.g.position.x = cheetah.position.x; advance(s, dx); });
+  }
+  function frame(now) {
+    var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+    if (visible) {
+      step(dt);
+      camera.position.x += (base[0] + mx * 1.2 - camera.position.x) * 0.05;
+      camera.position.y += (base[1] - my * 0.8 - camera.position.y) * 0.05;
+      camera.position.z = base[2];
+      camera.lookAt(look);
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(frame);
+  }
+  if (reduce) {
+    wait = 0; while (running) step(0.03);
+    var still = function () { camera.position.set(base[0], base[1], base[2]); camera.lookAt(look); renderer.render(scene, camera); };
+    still(); window.addEventListener('resize', still);
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>
