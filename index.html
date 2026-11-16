@@ -37,8 +37,27 @@
   h2 { font-family:'Space Grotesk', sans-serif; font-size:clamp(28px, 4vw, 38px); line-height:1.15; margin:0 0 20px; }
   p { margin:0 0 14px; color:var(--sub); }
   .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
-  .card { background:var(--card); border-radius:14px; padding:24px; transition:transform .25s ease; }
+  .grid { align-items:start; }
+  .card { background:var(--card); border-radius:14px; padding:24px; transition:transform .25s ease, box-shadow .25s ease; display:block; width:100%; text-align:left; font:inherit; color:inherit; border:1px solid transparent; cursor:pointer; }
   .card:hover { transform:translateY(-4px); }
+  .card:focus-visible { outline:2px solid var(--acc); outline-offset:3px; }
+  .card[aria-expanded="true"] { border-color:var(--acc); transform:none; }
+  .card.hl[aria-expanded="true"] { border-color:#fff; }
+  .more { display:flex; align-items:center; gap:8px; margin-top:16px; font-size:13px; font-weight:600; letter-spacing:2px; color:var(--acc); }
+  .card.hl .more { color:#fff; }
+  .more i { font-style:normal; display:inline-block; transition:transform .25s ease; font-size:18px; line-height:1; }
+  .card[aria-expanded="true"] .more i { transform:rotate(45deg); }
+  .det { display:grid; grid-template-rows:0fr; transition:grid-template-rows .35s ease; }
+  .card[aria-expanded="true"] .det { grid-template-rows:1fr; }
+  .det > div { overflow:hidden; }
+  .det ul { margin:16px 0 0; padding:16px 0 0; border-top:1px solid rgba(255,255,255,.12); list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .det li { font-size:14.5px; line-height:1.5; color:var(--sub); padding-left:16px; position:relative; }
+  .det li::before { content:""; position:absolute; left:0; top:9px; width:6px; height:6px; background:var(--acc); }
+  .det li b { color:var(--text); font-weight:600; }
+  .card.hl .det li { color:#fff; }
+  .card.hl .det li::before { background:#fff; }
+  .card.hl .det li b { color:#fff; }
+  .card.hl .det ul { border-top-color:rgba(255,255,255,.35); }
   .card h3 { font-family:'Space Grotesk', sans-serif; font-size:22px; margin:0 0 8px; }
   .card p { font-size:15px; margin:0; }
   .card p.kick { margin-bottom:10px; font-size:13px; }
@@ -50,7 +69,7 @@
   .pillars span { color:var(--sub); font-size:15px; }
   footer { padding:40px 0 56px; font-size:14px; }
   footer p { color:var(--mut); }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .card { transition:none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .card, .det, .more i { transition:none; } }
 </style>
 </head>
 <body>
@@ -72,7 +91,7 @@
     <p class="lead">Laboratório independente de pesquisa macroeconômica. Juros, inflação, atividade, contas públicas e câmbio, no Brasil e no mundo.</p>
     <div class="btns">
       <a class="btn primary" href="https://www.linkedin.com/company/legacyresearch/" target="_blank" rel="noopener">Siga no LinkedIn</a>
-      <a class="btn" href="https://github.com/LegacyResearch" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn" href="https://github.com/LegacyResearch" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="margin-right:8px"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
     </div>
   </div>
   <a class="scroll" href="#sobre">CONHEÇA ↓</a>
@@ -96,22 +115,44 @@
   <div class="wrap">
     <p class="kick">O QUE PUBLICAMOS</p>
     <h2>Três formatos, cada um com uma função</h2>
+    <p style="margin-bottom:24px">Toque em cada um para saber mais.</p>
     <div class="grid">
-      <div class="card">
-        <p class="kick">TODA SEGUNDA</p>
+      <button class="card" type="button" aria-expanded="false">
+        <p class="kick">TODA SEXTA + EXPECTATIVA DA SEMANA</p>
         <h3>Semana em análise</h3>
-        <p>Os números, os pregões dia a dia, Brasil, EUA, mundo e câmbio, e o que tudo isso significa junto.</p>
-      </div>
-      <div class="card">
+        <p>Os números, os pregões dia a dia, Brasil, EUA, mundo e câmbio, e o que tudo isso significa junto. E, antes de a semana começar, a nossa expectativa para ela.</p>
+        <span class="det"><span style="display:block;overflow:hidden"><ul>
+          <li><b>Semana em análise (sexta, após o fechamento):</b> o placar da semana, cada indicador do Brasil ligado ao pregão em que saiu, e o que moveu juros, câmbio, commodities, IA e cripto.</li>
+          <li><b>Expectativa da semana (antes da abertura):</b> a agenda do Brasil e do mundo, com a nossa expectativa para cada evento.</li>
+          <li><b>Mini teses:</b> a nossa leitura em uma frase, separada dos fatos.</li>
+          <li><b>Onde:</b> carrossel no LinkedIn, com o PDF completo no GitHub.</li>
+        </ul></span></span>
+        <span class="more"><i>+</i> SAIBA MAIS</span>
+      </button>
+      <button class="card" type="button" aria-expanded="false">
         <p class="kick">MENSAL</p>
         <h3>Tese do mês</h3>
         <p>Cenários, o que o mercado já precifica e o que invalidaria a leitura.</p>
-      </div>
-      <div class="card hl">
+        <span class="det"><span style="display:block;overflow:hidden"><ul>
+          <li><b>A tese:</b> uma leitura sobre juros, inflação, câmbio ou atividade, explicada com dados oficiais.</li>
+          <li><b>Cenários:</b> o que esperamos, o que o mercado já precifica e onde discordamos dele.</li>
+          <li><b>Gatilhos e prazo:</b> o que precisa acontecer, e até quando, para a tese se confirmar.</li>
+          <li><b>O que invalidaria:</b> registrado antes, para não mudar a régua depois.</li>
+        </ul></span></span>
+        <span class="more"><i>+</i> SAIBA MAIS</span>
+      </button>
+      <button class="card hl" type="button" aria-expanded="false">
         <p class="kick">TRIMESTRAL</p>
         <h3>Placar</h3>
         <p>Nossas previsões, registradas com data, contra o que aconteceu.</p>
-      </div>
+        <span class="det"><span style="display:block;overflow:hidden"><ul>
+          <li><b>O que entra:</b> as teses mensais, com a data em que foram publicadas.</li>
+          <li><b>Como medimos:</b> acerto, erro ou parcial, comparando com o dado oficial.</li>
+          <li><b>Quando erramos:</b> explicamos o que deixamos de ver.</li>
+          <li><b>Por quê:</b> pesquisa que não mostra os erros não dá para auditar.</li>
+        </ul></span></span>
+        <span class="more"><i>+</i> SAIBA MAIS</span>
+      </button>
     </div>
   </div>
 </section>
@@ -123,6 +164,16 @@
   </div>
 </footer>
 
+<script>
+document.querySelectorAll('.card').forEach(function (c) {
+  c.addEventListener('click', function () {
+    var open = c.getAttribute('aria-expanded') === 'true';
+    c.setAttribute('aria-expanded', open ? 'false' : 'true');
+    var m = c.querySelector('.more');
+    if (m) m.lastChild.nodeValue = open ? ' SAIBA MAIS' : ' FECHAR';
+  });
+});
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function () {
