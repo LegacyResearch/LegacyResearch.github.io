@@ -84,9 +84,12 @@
 #focus figure { margin:0; }
 #focus figure img { width:100%; height:auto; border-radius:14px; border:1px solid var(--line); display:block; }
 #focus figcaption { font-size:13px; color:var(--mut); margin-top:10px; }
-.fc-leitura { border-top:3px solid var(--acc); padding-top:16px; margin-top:28px; }
-.fc-leitura h3 { font-family:'Space Grotesk', sans-serif; font-size:22px; margin:0 0 8px; }
+.fc-leitura { background:var(--card); border:1px solid var(--line); border-top:3px solid var(--acc); border-radius:14px; padding:22px 22px 18px; }
+.fc-leitura h3 { font-family:'Space Grotesk', sans-serif; font-size:20px; margin:0 0 10px; }
 .fc-leitura p { white-space:pre-line; margin:0; }
+.fc-leitura .fc-leitura-texto { font-size:16.5px; line-height:1.65; color:var(--text); }
+.fc-leitura-voltar { margin-top:12px; background:none; border:0; padding:0; color:var(--acc); font:600 13px Inter, system-ui, sans-serif; cursor:pointer; }
+.fc-leitura.fc-trocou .fc-leitura-texto { animation:fc-sobe-card .4s ease both; }
 .fc-leitura p.fc-leitura-data { font-size:13px; font-weight:600; letter-spacing:2px; color:var(--acc); margin:0 0 6px; text-transform:uppercase; }
 .fc-antigas { margin-top:22px; border-top:1px solid var(--line); padding-top:14px; }
 .fc-antigas summary { cursor:pointer; font-weight:600; font-size:14px; color:var(--sub); list-style:none; display:inline-flex; align-items:center; gap:8px; }
@@ -135,13 +138,51 @@
   -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%); mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%); }
 .fc-tela.fechando { opacity:0; transform:translateY(16px); transition:opacity .28s ease, transform .28s ease; }
 .fc-barra-topo { position:sticky; top:0; z-index:2; background:rgba(11,13,16,.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
-.fc-barra-topo-in { display:flex; align-items:center; justify-content:space-between; min-height:64px; }
+.fc-barra-topo-in { display:flex; align-items:center; justify-content:space-between; min-height:64px; max-width:1240px; margin:0 auto; padding:0 24px; }
 .fc-marca-mini { display:flex; align-items:center; gap:10px; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:17px; }
 .fc-fechar { display:inline-flex; align-items:center; gap:10px; min-height:40px; padding:0 16px; border-radius:999px; border:1px solid #2A303A; background:transparent; color:var(--text);
   font:600 14px Inter, system-ui, sans-serif; cursor:pointer; }
 .fc-fechar:hover { border-color:var(--acc); }
 .fc-fechar:focus-visible { outline:2px solid var(--acc); outline-offset:3px; }
-.fc-conteudo { position:relative; padding-top:48px; padding-bottom:64px; }
+.fc-conteudo { position:relative; max-width:1240px; margin:0 auto; padding:22px 24px 32px; }
+.fc-cabeca { display:flex; align-items:flex-end; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; margin-bottom:16px; }
+.fc-cabeca h2 { margin:0 0 4px; font-size:clamp(26px, 3vw, 34px); }
+.fc-cabeca .kick { margin-bottom:6px; }
+.fc-sub { margin:0; font-size:14.5px; color:var(--mut); max-width:560px; }
+.fc-cabeca .fc-abas { margin:0; }
+.fc-grade { display:grid; grid-template-columns:minmax(0, 1.75fr) minmax(0, 1fr); gap:16px; align-items:stretch; }
+.fc-col-grafico { margin:0; min-width:0; }
+.fc-col-leitura { display:flex; flex-direction:column; gap:10px; min-width:0; }
+.fc-col-leitura .fc-fonte { margin:0; font-size:12px; }
+.fc-grafico-box { height:100%; display:flex; flex-direction:column; }
+.fc-grafico-box .fc-numeros { display:flex; flex-wrap:wrap; gap:8px 32px; margin:0 0 12px; }
+.fc-grafico-box .fc-card { background:none; padding:0; border-radius:0; }
+.fc-grafico-box .fc-card .valor { font-size:30px; margin-top:0; line-height:1.2; }
+.fc-grafico-box .fc-card .var { font-size:13px; }
+.fc-grafico-box figcaption { margin-top:8px; font-size:12px; color:var(--mut); }
+/* tudo numa tela só em telas grandes */
+@media (min-width:900px) and (min-height:600px) {
+  .fc-conteudo { height:calc(100vh - 65px); height:calc(100svh - 65px); display:flex; flex-direction:column; padding-bottom:20px; }
+  .fc-grade { flex:1; min-height:0; }
+  .fc-col-grafico, .fc-col-leitura { min-height:0; }
+  .fc-canvas-wrap { flex:1; height:auto; min-height:180px; }
+  .fc-leitura { flex:1; min-height:0; overflow-y:auto; }
+}
+@media (max-width:899px) {
+  .fc-grade { grid-template-columns:1fr; }
+  .fc-canvas-wrap { height:240px; }
+  .fc-sub { display:none; }
+  .fc-conteudo { padding-top:16px; }
+  .fc-cabeca { margin-bottom:12px; }
+  .fc-cabeca .fc-abas { gap:6px; }
+  .fc-cabeca .fc-abas button { min-height:36px; padding:0 14px; font-size:14px; }
+  .fc-grafico-box { padding:14px 14px 8px; }
+  .fc-grafico-box .fc-numeros { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; }
+  .fc-grafico-box .fc-card .valor { font-size:24px; }
+  .fc-grafico-box .fc-card .ano { font-size:11px; }
+  .fc-grafico-box .fc-card .var { font-size:12px; }
+  .fc-leitura .fc-leitura-texto { font-size:15.5px; }
+}
 
 /* entrada escalonada dos elementos */
 .fc-in { opacity:0; transform:translateY(18px); }
@@ -164,21 +205,6 @@
 .fc-s3 i { width:10px; height:10px; border-radius:50%; background:#F4F6F8; border:2px solid var(--acc); }
 .fc-canvas-wrap { position:relative; height:clamp(240px, 42vw, 360px); }
 #fc-grafico-png { width:100%; height:auto; border-radius:10px; display:block; }
-.fc-leitura-ponto { margin-top:12px; background:var(--card); border-left:3px solid var(--acc); border-radius:0 10px 10px 0; padding:12px 16px; font-size:14.5px; color:var(--sub); line-height:1.55; }
-.fc-leitura-ponto b { display:block; font-size:12px; letter-spacing:2px; color:var(--acc); margin-bottom:4px; text-transform:uppercase; }
-/* alertas de virada */
-.fc-alertas { display:flex; flex-direction:column; gap:10px; margin:0 0 16px; }
-.fc-alertas:empty { display:none; }
-.fc-alerta { display:flex; gap:12px; align-items:flex-start; padding:12px 16px; border-radius:12px; background:rgba(255,181,71,.08); border:1px solid rgba(255,181,71,.35); animation:fc-sobe-card .5s cubic-bezier(.2,.7,.2,1) both; }
-.fc-alerta-ic { flex:none; width:24px; height:24px; border-radius:50%; background:#FFB547; color:#0B0D10; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
-.fc-alerta b { display:block; color:var(--text); font-size:15px; }
-.fc-alerta div > span { font-size:13.5px; color:var(--sub); }
-.fc-alerta em { font-style:normal; font-size:11px; font-weight:700; letter-spacing:1.5px; color:#0B0D10; background:#FFB547; border-radius:4px; padding:1px 6px; margin-left:8px; vertical-align:2px; }
-.fc-abas button { position:relative; }
-.fc-abas button.fc-tem-alerta::after { content:""; position:absolute; top:6px; right:8px; width:7px; height:7px; border-radius:50%; background:#FFB547; }
-.fc-selo { display:inline-block; margin-top:8px; font-size:11px; font-weight:700; letter-spacing:1.5px; color:#FFB547; border:1px solid rgba(255,181,71,.45); border-radius:4px; padding:2px 7px; text-transform:uppercase; }
-.menu-item.fc-com-alerta .fc-pulso, .menu-item.fc-com-alerta .fc-pulso::after { background:#FFB547; }
-.menu-item .fc-menu-alerta { font-size:11px; font-weight:700; letter-spacing:1px; color:#0B0D10; background:#FFB547; border-radius:999px; padding:1px 7px; }
 
 @media (prefers-reduced-motion: reduce) {
   .fc-cortina { display:none; } .fc-in, .fc-tela.ativa .fc-in { opacity:1; transform:none; transition:none; }
@@ -286,42 +312,49 @@
 
 <div id="focus" class="fc-tela" role="dialog" aria-modal="true" aria-labelledby="fc-titulo" hidden>
 <div class="fc-barra-topo">
-<div class="wrap fc-barra-topo-in">
+<div class="fc-barra-topo-in">
 <span class="fc-marca-mini"><svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true"><polygon points="30,12 40,27 58,24 73,31 88,43 93,50 87,58 73,64 54,70 38,90 16,84 18,44 23,29" fill="#3D7BFF"/></svg>Legacy <span class="acc">Research</span></span>
 <button type="button" class="fc-fechar" id="fc-fechar">Voltar ao site <span aria-hidden="true">✕</span></button>
 </div>
 </div>
-<div class="wrap fc-conteudo">
-<p class="kick fc-in">BOLETIM FOCUS · ATUALIZAÇÃO AUTOMÁTICA</p>
-<h2 class="fc-in" id="fc-titulo">Análise do Focus</h2>
-<p class="fc-in" style="margin-bottom:24px">O que o mercado espera para a economia brasileira, com dados do Banco Central. Este painel se atualiza sozinho toda segunda-feira.</p>
-<div class="fc-abas fc-in" id="fc-abas" role="group" aria-label="Escolha o indicador">
+<div class="fc-conteudo">
+<div class="fc-cabeca fc-in">
+<div>
+<p class="kick">BOLETIM FOCUS · <span id="fc-atualizado">ATUALIZA TODA SEGUNDA</span></p>
+<h2 id="fc-titulo">Análise do Focus</h2>
+<p class="fc-sub">O que o mercado espera para a economia brasileira, com dados do Banco Central, e a nossa leitura de cada semana.</p>
+</div>
+<div class="fc-abas" id="fc-abas" role="group" aria-label="Escolha o indicador">
 <button type="button" data-id="ipca">IPCA</button>
 <button type="button" data-id="selic">Selic</button>
 <button type="button" data-id="cambio">Câmbio</button>
 <button type="button" data-id="pib">PIB</button>
 </div>
-<div class="fc-alertas" id="fc-alertas" aria-live="polite"></div>
-<div class="fc-numeros" id="fc-numeros"><div class="fc-card"><div class="ano">Carregando os dados…</div></div></div>
-<figure class="fc-in">
+</div>
+<div class="fc-grade">
+<figure class="fc-col-grafico fc-in">
 <div class="fc-grafico-box" id="fc-grafico">
-<div class="fc-grafico-topo"><span class="fc-serie fc-s1"></span><span class="fc-serie fc-s2"></span><span class="fc-serie fc-s3"><i></i>Leitura da semana</span></div>
+<div class="fc-numeros" id="fc-numeros"><div class="fc-card"><div class="ano">Carregando os dados…</div></div></div>
+<div class="fc-grafico-topo"><span class="fc-serie fc-s1"></span><span class="fc-serie fc-s2"></span><span class="fc-serie fc-s3"><i></i>Leitura da semana (clique no ponto)</span></div>
 <div class="fc-canvas-wrap"><canvas id="fc-canvas" role="img" aria-label="Gráfico interativo das projeções do Boletim Focus"></canvas></div>
 <img id="fc-grafico-png" alt="" hidden>
-</div>
-<div class="fc-leitura-ponto" id="fc-leitura-ponto" hidden></div>
 <figcaption id="fc-legenda"></figcaption>
+</div>
 </figure>
-<div class="fc-leitura" id="fc-leitura" hidden>
-<p class="fc-leitura-data" id="fc-leitura-data"></p>
-<h3>Leitura da semana</h3>
-<p id="fc-leitura-texto"></p>
+<aside class="fc-col-leitura fc-in">
+<div class="fc-leitura" id="fc-leitura">
+<p class="fc-leitura-data" id="fc-leitura-data">LEITURA DA SEMANA</p>
+<h3>Nossa leitura</h3>
+<p id="fc-leitura-texto" class="fc-leitura-texto">A leitura da semana sai toda segunda, depois do Focus.</p>
+<button type="button" class="fc-leitura-voltar" id="fc-leitura-voltar" hidden>← Voltar para a mais recente</button>
 <details class="fc-antigas" id="fc-antigas" hidden>
 <summary>Semanas anteriores</summary>
 <div id="fc-antigas-lista"></div>
 </details>
 </div>
-<p class="fc-fonte">Fonte: <a href="https://www.bcb.gov.br/publicacoes/focus" target="_blank" rel="noopener">Banco Central do Brasil – Boletim Focus</a>. Projeções medianas do mercado.</p>
+<p class="fc-fonte">Fonte: <a href="https://www.bcb.gov.br/publicacoes/focus" target="_blank" rel="noopener">Banco Central do Brasil – Boletim Focus</a>. Projeções medianas do mercado. Conteúdo educacional, sem recomendação de investimento.</p>
+</aside>
+</div>
 </div>
 </div>
 
@@ -546,26 +579,15 @@ document.querySelectorAll('.card').forEach(function (c) {
 (function () {
 var IND = {
   ipca:   { nome: "IPCA",      titulo: "IPCA",                imagem: "ipca_focus.png",   tipo: "pct",
-            legenda: "Projeção mediana do IPCA (%). Faixa azul: intervalo de tolerância da meta (1,5% a 4,5%); tracejado: centro da meta (3%).",
+            legenda: "Projeção mediana do IPCA. Faixa azul: tolerância da meta (1,5% a 4,5%).",
             escalaMin: 2, banda: [1.5, 4.5], centro: 3 },
   selic:  { nome: "Selic",     titulo: "Selic no fim do ano", imagem: "selic_focus.png",  tipo: "pct",
-            legenda: "Projeção mediana da taxa Selic no fim de cada ano (% ao ano).", escalaMin: 3 },
+            legenda: "Projeção mediana da Selic no fim de cada ano (% ao ano).", escalaMin: 3 },
   cambio: { nome: "Câmbio",    titulo: "Dólar no fim do ano", imagem: "cambio_focus.png", tipo: "real",
             legenda: "Projeção mediana do dólar no fim de cada ano (R$ por US$).", escalaMin: 1 },
   pib:    { nome: "PIB Total", titulo: "PIB",                 imagem: "pib_focus.png",    tipo: "pct",
             legenda: "Projeção mediana do crescimento do PIB (%).", escalaMin: 2 }
 };
-// ---------- ALERTAS DE VIRADA (edite aqui para criar ou mudar regras) ----------
-// teto:  avisa enquanto a projeção estiver acima do nível (ex.: IPCA acima do teto da meta)
-// nivel: avisa quando a projeção cruza um múltiplo de "passo" na última semana (ex.: dólar passando de R$ 5,50)
-// salto: avisa quando a projeção anda "minimo" ou mais em uma semana
-var ALERTAS = [
-  { id: "ipca",   tipo: "teto",  nivel: 4.5,  texto: "acima do teto da meta (4,5%)" },
-  { id: "cambio", tipo: "nivel", passo: 0.5 },
-  { id: "pib",    tipo: "nivel", passo: 1 },
-  { id: "selic",  tipo: "salto", minimo: 0.25 }
-];
-var NOVO_DIAS = 14;   // selo "NOVO" quando a virada aconteceu nos últimos 14 dias
 var leituras = [], grafico = null;
 var linhas = [], ultimaData = null, atual = "ipca";
 // onde procurar dados e gráficos: primeiro ao lado da página, depois o site publicado, depois o repositório.
@@ -585,9 +607,8 @@ function mostrar(id) {
     var on = b.dataset.id === id; b.classList.toggle("ativa", on); b.setAttribute("aria-pressed", on);
   });
   desenhar(id, cfg);
-  mostrarAlertas(id);
   var leg = cfg.legenda;
-  if (ultimaData) leg += " Atualizado em " + ultimaData.toLocaleDateString("pt-BR", { timeZone: "UTC" }) + ".";
+  if (ultimaData) document.getElementById("fc-atualizado").textContent = "ATUALIZADO EM " + ultimaData.toLocaleDateString("pt-BR", { timeZone: "UTC" });
   document.getElementById("fc-legenda").textContent = leg;
   var caixa = document.getElementById("fc-numeros");
   var dados = linhas.filter(function (l) { return l.indicador === cfg.nome; });
@@ -604,9 +625,8 @@ function mostrar(id) {
       txt = Math.abs(d) < 0.005 ? "sem mudança na semana" : (d > 0 ? "▲ " : "▼ ") + val + " na semana";
       cls = Math.abs(d) < 0.005 ? "" : (d > 0 ? "fc-sobe" : "fc-desce");
     }
-    var selo = alertasAtivos().some(function (a) { return a.id === id && a.ano === ano; }) ? '<div class="fc-selo">Alerta</div>' : "";
     caixa.insertAdjacentHTML("beforeend", '<div class="fc-card"><div class="ano">' + cfg.titulo + " · " + ano +
-      '</div><div class="valor" data-v="' + ult.mediana + '">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div>" + selo + "</div>");
+      '</div><div class="valor" data-v="' + ult.mediana + '">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div></div>");
   });
   contar(caixa, cfg.tipo);
 }
@@ -639,7 +659,6 @@ var bandaMeta = {                    // faixa da meta de inflação desenhada at
 function desenhar(id, cfg) {
   var box = document.getElementById("fc-grafico"), png = document.getElementById("fc-grafico-png"), cv = document.getElementById("fc-canvas");
   box.classList.remove("revela");
-  document.getElementById("fc-leitura-ponto").hidden = true;
   var dados = linhas.filter(function (l) { return l.indicador === cfg.nome; });
   if (!window.Chart || !dados.length) {        // sem Chart.js (ou sem dados): volta para a imagem gerada pelo robô
     cv.parentNode.hidden = true; png.hidden = false;
@@ -715,74 +734,24 @@ function desenhar(id, cfg) {
           }
         }
       },
-      onClick: function (e, els) {          // toque no marcador: mostra a leitura inteira embaixo do gráfico
-        var m = els.filter(function (x) { return x.datasetIndex === sets.length - 1; })[0], caixa = document.getElementById("fc-leitura-ponto");
-        if (!m || !textos[m.index]) { caixa.hidden = true; return; }
-        var lt = textos[m.index]; caixa.innerHTML = "";
-        var b = document.createElement("b"); b.textContent = "Leitura da semana · Focus de " + dataCurta(lt.data);
-        caixa.appendChild(b); caixa.appendChild(document.createTextNode(lt.texto)); caixa.hidden = false;
+      onClick: function (e, els) {          // clique no marcador: a leitura daquela semana aparece no card ao lado
+        var m = els.filter(function (x) { return x.datasetIndex === sets.length - 1; })[0];
+        if (m && textos[m.index]) mostrarLeitura(textos[m.index], textos[m.index] === leituras[0]);
       }
     }
   });
   requestAnimationFrame(function () { requestAnimationFrame(function () { box.classList.add("revela"); }); });
 }
 
-// ---------- alertas de virada ----------
-function valorEm(serie, data) { var v = null; serie.forEach(function (l) { if (l.data <= data) v = l; }); return v; }
-function alertasAtivos() {
-  if (!linhas.length) return [];
-  var out = [];
-  ALERTAS.forEach(function (r) {
-    var cfg = IND[r.id]; if (!cfg) return;
-    var dados = linhas.filter(function (l) { return l.indicador === cfg.nome; });
-    Array.from(new Set(dados.map(function (l) { return l.ano; }))).sort().forEach(function (ano) {
-      var s = dados.filter(function (l) { return l.ano === ano; }).sort(function (a, b) { return a.data - b.data; });
-      var ult = s[s.length - 1], sem = valorEm(s, new Date(ult.data - 7 * 864e5)); if (!ult) return;
-      var nome = cfg.titulo + " " + ano;
-      if (r.tipo === "teto" && ult.mediana > r.nivel) {
-        var desde = ult.data; for (var i = s.length - 1; i >= 0 && s[i].mediana > r.nivel; i--) desde = s[i].data;
-        out.push({ id: r.id, ano: ano, titulo: nome + " " + r.texto, detalhe: "Projeção atual: " + fmt(ult.mediana, cfg.tipo) + ". Acima do teto desde " + desde.toLocaleDateString("pt-BR", { timeZone: "UTC" }) + ".",
-                   novo: (ult.data - desde) / 864e5 <= NOVO_DIAS });
-      }
-      if (r.tipo === "nivel" && sem) {
-        var a = Math.floor(sem.mediana / r.passo), b = Math.floor(ult.mediana / r.passo);
-        if (a !== b) {
-          var nivel = Math.max(a, b) * r.passo, subiu = ult.mediana > sem.mediana;
-          out.push({ id: r.id, ano: ano, titulo: nome + (subiu ? " passou de " : " caiu abaixo de ") + fmt(nivel, cfg.tipo),
-                     detalhe: "De " + fmt(sem.mediana, cfg.tipo) + " para " + fmt(ult.mediana, cfg.tipo) + " na semana.", novo: true });
-        }
-      }
-      if (r.tipo === "salto" && sem && Math.abs(ult.mediana - sem.mediana) >= r.minimo - 1e-9) {
-        var dd = ult.mediana - sem.mediana;
-        out.push({ id: r.id, ano: ano, titulo: nome + (dd > 0 ? " subiu " : " caiu ") + Math.abs(dd).toFixed(2).replace(".", ",") + " p.p. na semana",
-                   detalhe: "De " + fmt(sem.mediana, cfg.tipo) + " para " + fmt(ult.mediana, cfg.tipo) + ".", novo: true });
-      }
-    });
-  });
-  return out;
+// ---------- leitura da semana (card ao lado do gráfico) ----------
+function mostrarLeitura(lt, recente) {
+  var box = document.getElementById("fc-leitura");
+  document.getElementById("fc-leitura-data").textContent = (recente ? "Leitura mais recente · " : "Leitura da semana · ") + "Focus de " + dataCurta(lt.data);
+  document.getElementById("fc-leitura-texto").textContent = lt.texto;
+  document.getElementById("fc-leitura-voltar").hidden = !!recente;
+  box.classList.remove("fc-trocou"); void box.offsetWidth; box.classList.add("fc-trocou");
 }
-function mostrarAlertas(id) {
-  var todos = alertasAtivos(), caixa = document.getElementById("fc-alertas");
-  document.querySelectorAll("#fc-abas button").forEach(function (b) {
-    b.classList.toggle("fc-tem-alerta", todos.some(function (a) { return a.id === b.dataset.id; }));
-  });
-  caixa.innerHTML = "";
-  todos.filter(function (a) { return a.id === id; }).forEach(function (a) {
-    var d = document.createElement("div"); d.className = "fc-alerta";
-    d.innerHTML = '<span class="fc-alerta-ic" aria-hidden="true">!</span><div><b></b><span></span></div>';
-    d.querySelector("b").textContent = a.titulo; d.querySelector("span:last-child").textContent = a.detalhe;
-    if (a.novo) { var e = document.createElement("em"); e.textContent = "NOVO"; d.querySelector("b").appendChild(e); }
-    caixa.appendChild(d);
-  });
-}
-function marcarMenu() {                // item do menu fica laranja quando há alerta
-  var n = alertasAtivos().length, item = document.getElementById("fc-chip");
-  item.classList.toggle("fc-com-alerta", n > 0);
-  var tag = item.querySelector(".fc-menu-alerta");
-  if (n && !tag) { tag = document.createElement("span"); tag.className = "fc-menu-alerta"; item.appendChild(tag); }
-  if (tag) { if (n) tag.textContent = n + (n > 1 ? " alertas" : " alerta"); else tag.remove(); }
-  item.title = n ? n + (n > 1 ? " alertas de virada no Focus" : " alerta de virada no Focus") : "";
-}
+document.getElementById("fc-leitura-voltar").addEventListener("click", function () { if (leituras[0]) mostrarLeitura(leituras[0], true); });
 
 // números sobem de zero até o valor da semana
 function contar(caixa, tipo) {
@@ -856,7 +825,6 @@ buscar("dados/focus.csv?v=" + Date.now())
     linhas = ls.map(function (l) { var c = l.split(","); return { indicador: c[i.ind], data: new Date(c[i.data]), ano: c[i.ano], mediana: parseFloat(c[i.med]) }; })
       .filter(function (l) { return !isNaN(l.mediana); });
     ultimaData = new Date(Math.max.apply(null, linhas.map(function (l) { return l.data; })));
-    marcarMenu();
     mostrar(atual);
   })
   .catch(function () {
@@ -873,9 +841,7 @@ buscar("dados/analises.json?v=" + Date.now())
     if (!lista.length) return;
     leituras = lista;
     if (aberto && linhas.length) desenhar(atual, IND[atual]);
-    document.getElementById("fc-leitura-data").textContent = "Focus de " + dataBR(lista[0].data);
-    document.getElementById("fc-leitura-texto").textContent = lista[0].texto;
-    document.getElementById("fc-leitura").hidden = false;
+    mostrarLeitura(lista[0], true);
     var antigas = lista.slice(1);
     if (!antigas.length) return;
     var caixa = document.getElementById("fc-antigas-lista");
