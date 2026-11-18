@@ -154,6 +154,31 @@
 @keyframes fc-sobe-card { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 #fc-grafico { clip-path:inset(0 100% 0 0); }
 #fc-grafico.revela { clip-path:inset(0 0 0 0); transition:clip-path 1s cubic-bezier(.5,0,.2,1); }
+/* gráfico interativo */
+.fc-grafico-box { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 18px 10px; }
+.fc-grafico-topo { display:flex; flex-wrap:wrap; gap:6px 18px; margin-bottom:10px; font-size:13px; color:var(--sub); }
+.fc-serie { display:inline-flex; align-items:center; gap:8px; }
+.fc-serie::before { content:""; width:18px; height:3px; border-radius:2px; background:var(--acc); }
+.fc-s2::before { background:#9DBBFF; height:0; border-top:2px dashed #9DBBFF; }
+.fc-s3::before { display:none; }
+.fc-s3 i { width:10px; height:10px; border-radius:50%; background:#F4F6F8; border:2px solid var(--acc); }
+.fc-canvas-wrap { position:relative; height:clamp(240px, 42vw, 360px); }
+#fc-grafico-png { width:100%; height:auto; border-radius:10px; display:block; }
+.fc-leitura-ponto { margin-top:12px; background:var(--card); border-left:3px solid var(--acc); border-radius:0 10px 10px 0; padding:12px 16px; font-size:14.5px; color:var(--sub); line-height:1.55; }
+.fc-leitura-ponto b { display:block; font-size:12px; letter-spacing:2px; color:var(--acc); margin-bottom:4px; text-transform:uppercase; }
+/* alertas de virada */
+.fc-alertas { display:flex; flex-direction:column; gap:10px; margin:0 0 16px; }
+.fc-alertas:empty { display:none; }
+.fc-alerta { display:flex; gap:12px; align-items:flex-start; padding:12px 16px; border-radius:12px; background:rgba(255,181,71,.08); border:1px solid rgba(255,181,71,.35); animation:fc-sobe-card .5s cubic-bezier(.2,.7,.2,1) both; }
+.fc-alerta-ic { flex:none; width:24px; height:24px; border-radius:50%; background:#FFB547; color:#0B0D10; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+.fc-alerta b { display:block; color:var(--text); font-size:15px; }
+.fc-alerta div > span { font-size:13.5px; color:var(--sub); }
+.fc-alerta em { font-style:normal; font-size:11px; font-weight:700; letter-spacing:1.5px; color:#0B0D10; background:#FFB547; border-radius:4px; padding:1px 6px; margin-left:8px; vertical-align:2px; }
+.fc-abas button { position:relative; }
+.fc-abas button.fc-tem-alerta::after { content:""; position:absolute; top:6px; right:8px; width:7px; height:7px; border-radius:50%; background:#FFB547; }
+.fc-selo { display:inline-block; margin-top:8px; font-size:11px; font-weight:700; letter-spacing:1.5px; color:#FFB547; border:1px solid rgba(255,181,71,.45); border-radius:4px; padding:2px 7px; text-transform:uppercase; }
+.menu-item.fc-com-alerta .fc-pulso, .menu-item.fc-com-alerta .fc-pulso::after { background:#FFB547; }
+.menu-item .fc-menu-alerta { font-size:11px; font-weight:700; letter-spacing:1px; color:#0B0D10; background:#FFB547; border-radius:999px; padding:1px 7px; }
 
 @media (prefers-reduced-motion: reduce) {
   .fc-cortina { display:none; } .fc-in, .fc-tela.ativa .fc-in { opacity:1; transform:none; transition:none; }
@@ -276,9 +301,15 @@
 <button type="button" data-id="cambio">Câmbio</button>
 <button type="button" data-id="pib">PIB</button>
 </div>
+<div class="fc-alertas" id="fc-alertas" aria-live="polite"></div>
 <div class="fc-numeros" id="fc-numeros"><div class="fc-card"><div class="ano">Carregando os dados…</div></div></div>
 <figure class="fc-in">
-<img id="fc-grafico" src="graficos/ipca_focus.png" alt="Gráfico das projeções do Boletim Focus">
+<div class="fc-grafico-box" id="fc-grafico">
+<div class="fc-grafico-topo"><span class="fc-serie fc-s1"></span><span class="fc-serie fc-s2"></span><span class="fc-serie fc-s3"><i></i>Leitura da semana</span></div>
+<div class="fc-canvas-wrap"><canvas id="fc-canvas" role="img" aria-label="Gráfico interativo das projeções do Boletim Focus"></canvas></div>
+<img id="fc-grafico-png" alt="" hidden>
+</div>
+<div class="fc-leitura-ponto" id="fc-leitura-ponto" hidden></div>
 <figcaption id="fc-legenda"></figcaption>
 </figure>
 <div class="fc-leitura" id="fc-leitura" hidden>
@@ -509,19 +540,33 @@ document.querySelectorAll('.card').forEach(function (c) {
   }
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 // Painel do Boletim Focus: lê dados/focus.csv e graficos/*.png, gerados toda segunda pelo robô do GitHub Actions
 (function () {
 var IND = {
   ipca:   { nome: "IPCA",      titulo: "IPCA",                imagem: "ipca_focus.png",   tipo: "pct",
-            legenda: "Projeção mediana do IPCA (%). Faixa clara: intervalo da meta de inflação (1,5% a 4,5%)." },
+            legenda: "Projeção mediana do IPCA (%). Faixa azul: intervalo de tolerância da meta (1,5% a 4,5%); tracejado: centro da meta (3%).",
+            escalaMin: 2, banda: [1.5, 4.5], centro: 3 },
   selic:  { nome: "Selic",     titulo: "Selic no fim do ano", imagem: "selic_focus.png",  tipo: "pct",
-            legenda: "Projeção mediana da taxa Selic no fim de cada ano (% ao ano)." },
+            legenda: "Projeção mediana da taxa Selic no fim de cada ano (% ao ano).", escalaMin: 3 },
   cambio: { nome: "Câmbio",    titulo: "Dólar no fim do ano", imagem: "cambio_focus.png", tipo: "real",
-            legenda: "Projeção mediana do dólar no fim de cada ano (R$ por US$)." },
+            legenda: "Projeção mediana do dólar no fim de cada ano (R$ por US$).", escalaMin: 1 },
   pib:    { nome: "PIB Total", titulo: "PIB",                 imagem: "pib_focus.png",    tipo: "pct",
-            legenda: "Projeção mediana do crescimento do PIB (%)." }
+            legenda: "Projeção mediana do crescimento do PIB (%).", escalaMin: 2 }
 };
+// ---------- ALERTAS DE VIRADA (edite aqui para criar ou mudar regras) ----------
+// teto:  avisa enquanto a projeção estiver acima do nível (ex.: IPCA acima do teto da meta)
+// nivel: avisa quando a projeção cruza um múltiplo de "passo" na última semana (ex.: dólar passando de R$ 5,50)
+// salto: avisa quando a projeção anda "minimo" ou mais em uma semana
+var ALERTAS = [
+  { id: "ipca",   tipo: "teto",  nivel: 4.5,  texto: "acima do teto da meta (4,5%)" },
+  { id: "cambio", tipo: "nivel", passo: 0.5 },
+  { id: "pib",    tipo: "nivel", passo: 1 },
+  { id: "selic",  tipo: "salto", minimo: 0.25 }
+];
+var NOVO_DIAS = 14;   // selo "NOVO" quando a virada aconteceu nos últimos 14 dias
+var leituras = [], grafico = null;
 var linhas = [], ultimaData = null, atual = "ipca";
 // onde procurar dados e gráficos: primeiro ao lado da página, depois o site publicado, depois o repositório.
 // Assim o painel funciona no GitHub Pages, abrindo o arquivo no computador e em prévias.
@@ -539,18 +584,8 @@ function mostrar(id) {
   document.querySelectorAll("#fc-abas button").forEach(function (b) {
     var on = b.dataset.id === id; b.classList.toggle("ativa", on); b.setAttribute("aria-pressed", on);
   });
-  var img = document.getElementById("fc-grafico");
-  img.classList.remove("revela");
-  var tentativa = 0, sufixo = "graficos/" + cfg.imagem + "?v=" + (ultimaData ? ultimaData.getTime() : Date.now());
-  img.onload = function () { requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add("revela"); }); }); };
-  img.onerror = function () {          // não achou ao lado do site? tenta o endereço público
-    tentativa++;
-    if (tentativa < BASES.length) img.src = BASES[tentativa] + sufixo;
-    else { img.classList.add("revela"); img.alt = "Não foi possível carregar o gráfico agora."; }
-  };
-  img.src = BASES[0] + sufixo;
-  if (img.complete && img.naturalWidth) img.onload();
-  img.alt = "Gráfico das projeções do Boletim Focus para " + cfg.titulo;
+  desenhar(id, cfg);
+  mostrarAlertas(id);
   var leg = cfg.legenda;
   if (ultimaData) leg += " Atualizado em " + ultimaData.toLocaleDateString("pt-BR", { timeZone: "UTC" }) + ".";
   document.getElementById("fc-legenda").textContent = leg;
@@ -569,11 +604,186 @@ function mostrar(id) {
       txt = Math.abs(d) < 0.005 ? "sem mudança na semana" : (d > 0 ? "▲ " : "▼ ") + val + " na semana";
       cls = Math.abs(d) < 0.005 ? "" : (d > 0 ? "fc-sobe" : "fc-desce");
     }
+    var selo = alertasAtivos().some(function (a) { return a.id === id && a.ano === ano; }) ? '<div class="fc-selo">Alerta</div>' : "";
     caixa.insertAdjacentHTML("beforeend", '<div class="fc-card"><div class="ano">' + cfg.titulo + " · " + ano +
-      '</div><div class="valor" data-v="' + ult.mediana + '">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div></div>");
+      '</div><div class="valor" data-v="' + ult.mediana + '">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div>" + selo + "</div>");
   });
   contar(caixa, cfg.tipo);
 }
+// ---------- gráfico interativo (Chart.js) ----------
+function dataISO(d) { return d.toISOString().slice(0, 10); }
+function dataCurta(iso) { var p = iso.split("-"); return p[2] + "/" + p[1] + "/" + p[0].slice(2); }
+function quebrar(txt, n) {           // quebra o texto da leitura em linhas para caber na caixinha
+  var out = [], linha = "";
+  txt.split(" ").forEach(function (w) { if ((linha + " " + w).trim().length > n) { out.push(linha.trim()); linha = w; } else linha += " " + w; });
+  if (linha.trim()) out.push(linha.trim()); return out;
+}
+var bandaMeta = {                    // faixa da meta de inflação desenhada atrás das linhas
+  id: "fcBanda",
+  beforeDatasetsDraw: function (c, args, op) {
+    if (!op || !op.banda) return;
+    var y = c.scales.y, a = c.chartArea, ctx = c.ctx;
+    var y1 = Math.max(a.top, y.getPixelForValue(op.banda[1])), y2 = Math.min(a.bottom, y.getPixelForValue(op.banda[0]));
+    ctx.save();
+    if (y2 > y1) { ctx.fillStyle = "rgba(61,123,255,.09)"; ctx.fillRect(a.left, y1, a.right - a.left, y2 - y1); }
+    var yc = y.getPixelForValue(op.centro);
+    if (yc > a.top && yc < a.bottom) {
+      ctx.strokeStyle = "rgba(195,202,212,.5)"; ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(a.left, yc); ctx.lineTo(a.right, yc); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle = "#8A94A3"; ctx.font = "11px Inter, sans-serif"; ctx.fillText("Meta " + String(op.centro).replace(".", ",") + "%", a.left + 6, yc - 6);
+    }
+    var yt = y.getPixelForValue(op.banda[1]);
+    if (yt > a.top && yt < a.bottom) { ctx.fillStyle = "#8A94A3"; ctx.font = "11px Inter, sans-serif"; ctx.fillText("Teto " + String(op.banda[1]).replace(".", ",") + "%", a.left + 6, yt - 6); }
+    ctx.restore();
+  }
+};
+function desenhar(id, cfg) {
+  var box = document.getElementById("fc-grafico"), png = document.getElementById("fc-grafico-png"), cv = document.getElementById("fc-canvas");
+  box.classList.remove("revela");
+  document.getElementById("fc-leitura-ponto").hidden = true;
+  var dados = linhas.filter(function (l) { return l.indicador === cfg.nome; });
+  if (!window.Chart || !dados.length) {        // sem Chart.js (ou sem dados): volta para a imagem gerada pelo robô
+    cv.parentNode.hidden = true; png.hidden = false;
+    png.alt = "Gráfico das projeções do Boletim Focus para " + cfg.titulo;
+    var t = 0, suf = "graficos/" + cfg.imagem + "?v=" + (ultimaData ? ultimaData.getTime() : Date.now());
+    png.onload = function () { box.classList.add("revela"); };
+    png.onerror = function () { t++; if (t < BASES.length) png.src = BASES[t] + suf; else box.classList.add("revela"); };
+    png.src = BASES[0] + suf; return;
+  }
+  cv.parentNode.hidden = false; png.hidden = true;
+  var anos = Array.from(new Set(dados.map(function (l) { return l.ano; }))).sort();
+  var limite = new Date(ultimaData - 365 * 864e5);
+  var datas = Array.from(new Set(dados.filter(function (l) { return l.data >= limite; }).map(function (l) { return dataISO(l.data); }))).sort();
+  var mapa = {}; dados.forEach(function (l) { mapa[l.ano + "|" + dataISO(l.data)] = l.mediana; });
+  var cores = ["#3D7BFF", "#9DBBFF"], todos = [];
+  var sets = anos.slice(0, 2).map(function (ano, i) {
+    var vals = datas.map(function (d) { var v = mapa[ano + "|" + d]; if (v != null) todos.push(v); return v == null ? null : v; });
+    return { label: cfg.titulo + " " + ano, data: vals, borderColor: cores[i], backgroundColor: cores[i], borderWidth: i ? 2 : 2.5,
+             borderDash: i ? [6, 4] : [], pointRadius: 0, pointHoverRadius: 4, tension: .25, spanGaps: true };
+  });
+  // marcadores: cada Leitura da semana vira um ponto sobre a linha do ano atual
+  var base = sets[0].data, marcas = datas.map(function () { return null; }), textos = {};
+  leituras.forEach(function (lt) {
+    var idx = -1; for (var k = 0; k < datas.length; k++) if (datas[k] <= lt.data) idx = k;
+    if (idx < 0) return;
+    while (idx > 0 && base[idx] == null) idx--;
+    if (base[idx] == null) return;
+    marcas[idx] = base[idx]; textos[idx] = lt;
+  });
+  sets.push({ label: "Leitura da semana", data: marcas, showLine: false, pointRadius: 7, pointHoverRadius: 9,
+              pointBackgroundColor: "#F4F6F8", pointBorderColor: "#3D7BFF", pointBorderWidth: 3, order: -1 });
+  var sl = document.querySelectorAll(".fc-serie");
+  sl[0].textContent = cfg.titulo + " " + (anos[0] || ""); sl[1].textContent = anos[1] ? cfg.titulo + " " + anos[1] : ""; sl[1].hidden = !anos[1];
+  // escala mínima: pequenas variações não parecem enormes
+  var mn = Math.min.apply(null, todos), mx = Math.max.apply(null, todos), faixa = cfg.escalaMin || 0;
+  if (cfg.banda) { mn = Math.min(mn, cfg.centro); }
+  if (mx - mn < faixa) { var meio = (mx + mn) / 2; mn = meio - faixa / 2; mx = meio + faixa / 2; }
+  var folga = (mx - mn) * 0.08;
+  if (grafico) grafico.destroy();
+  grafico = new Chart(cv, {
+    type: "line",
+    data: { labels: datas, datasets: sets },
+    plugins: [bandaMeta],
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: calmo ? false : { duration: 600 },
+      interaction: { mode: "nearest", intersect: false, axis: "x" },
+      layout: { padding: { top: 6, right: 6 } },
+      scales: {
+        x: { grid: { display: false }, border: { color: "#2A303A" },
+             ticks: { color: "#8A94A3", maxRotation: 0, autoSkip: true, maxTicksLimit: 6, font: { family: "Inter", size: 11 },
+                      callback: function (v) { var d = this.getLabelForValue(v).split("-"); return ["", "jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][+d[1]] + "/" + d[0].slice(2); } } },
+        y: { min: mn - folga, max: mx + folga, grid: { color: "rgba(255,255,255,.06)" }, border: { display: false },
+             ticks: { color: "#8A94A3", font: { family: "Inter", size: 11 }, maxTicksLimit: 6,
+                      callback: function (v) { return cfg.tipo === "real" ? "R$ " + v.toFixed(2).replace(".", ",") : v.toFixed(1).replace(".", ",") + "%"; } } }
+      },
+      plugins: {
+        legend: { display: false }, fcBanda: cfg.banda ? { banda: cfg.banda, centro: cfg.centro } : null,
+        tooltip: {
+          backgroundColor: "#0B0D10", borderColor: "#2A303A", borderWidth: 1, padding: 12, titleColor: "#F4F6F8", bodyColor: "#C3CAD4",
+          titleFont: { family: "Inter", weight: "600" }, bodyFont: { family: "Inter" }, displayColors: true, boxPadding: 4,
+          callbacks: {
+            title: function (it) { return it.length ? dataCurta(it[0].label) : ""; },
+            label: function (it) {
+              if (it.datasetIndex === sets.length - 1) return "Leitura da semana";
+              return it.dataset.label + ": " + fmt(it.parsed.y, cfg.tipo);
+            },
+            afterBody: function (it) {
+              var m = it.filter(function (x) { return x.datasetIndex === sets.length - 1; })[0];
+              if (!m || !textos[m.dataIndex]) return [];
+              // no celular o texto inteiro cobriria o gráfico: lá ele aparece na caixa embaixo, ao tocar no ponto
+              return window.innerWidth > 640 ? [""].concat(quebrar(textos[m.dataIndex].texto, 46)) : ["", "Toque para ler a análise"];
+            }
+          }
+        }
+      },
+      onClick: function (e, els) {          // toque no marcador: mostra a leitura inteira embaixo do gráfico
+        var m = els.filter(function (x) { return x.datasetIndex === sets.length - 1; })[0], caixa = document.getElementById("fc-leitura-ponto");
+        if (!m || !textos[m.index]) { caixa.hidden = true; return; }
+        var lt = textos[m.index]; caixa.innerHTML = "";
+        var b = document.createElement("b"); b.textContent = "Leitura da semana · Focus de " + dataCurta(lt.data);
+        caixa.appendChild(b); caixa.appendChild(document.createTextNode(lt.texto)); caixa.hidden = false;
+      }
+    }
+  });
+  requestAnimationFrame(function () { requestAnimationFrame(function () { box.classList.add("revela"); }); });
+}
+
+// ---------- alertas de virada ----------
+function valorEm(serie, data) { var v = null; serie.forEach(function (l) { if (l.data <= data) v = l; }); return v; }
+function alertasAtivos() {
+  if (!linhas.length) return [];
+  var out = [];
+  ALERTAS.forEach(function (r) {
+    var cfg = IND[r.id]; if (!cfg) return;
+    var dados = linhas.filter(function (l) { return l.indicador === cfg.nome; });
+    Array.from(new Set(dados.map(function (l) { return l.ano; }))).sort().forEach(function (ano) {
+      var s = dados.filter(function (l) { return l.ano === ano; }).sort(function (a, b) { return a.data - b.data; });
+      var ult = s[s.length - 1], sem = valorEm(s, new Date(ult.data - 7 * 864e5)); if (!ult) return;
+      var nome = cfg.titulo + " " + ano;
+      if (r.tipo === "teto" && ult.mediana > r.nivel) {
+        var desde = ult.data; for (var i = s.length - 1; i >= 0 && s[i].mediana > r.nivel; i--) desde = s[i].data;
+        out.push({ id: r.id, ano: ano, titulo: nome + " " + r.texto, detalhe: "Projeção atual: " + fmt(ult.mediana, cfg.tipo) + ". Acima do teto desde " + desde.toLocaleDateString("pt-BR", { timeZone: "UTC" }) + ".",
+                   novo: (ult.data - desde) / 864e5 <= NOVO_DIAS });
+      }
+      if (r.tipo === "nivel" && sem) {
+        var a = Math.floor(sem.mediana / r.passo), b = Math.floor(ult.mediana / r.passo);
+        if (a !== b) {
+          var nivel = Math.max(a, b) * r.passo, subiu = ult.mediana > sem.mediana;
+          out.push({ id: r.id, ano: ano, titulo: nome + (subiu ? " passou de " : " caiu abaixo de ") + fmt(nivel, cfg.tipo),
+                     detalhe: "De " + fmt(sem.mediana, cfg.tipo) + " para " + fmt(ult.mediana, cfg.tipo) + " na semana.", novo: true });
+        }
+      }
+      if (r.tipo === "salto" && sem && Math.abs(ult.mediana - sem.mediana) >= r.minimo - 1e-9) {
+        var dd = ult.mediana - sem.mediana;
+        out.push({ id: r.id, ano: ano, titulo: nome + (dd > 0 ? " subiu " : " caiu ") + Math.abs(dd).toFixed(2).replace(".", ",") + " p.p. na semana",
+                   detalhe: "De " + fmt(sem.mediana, cfg.tipo) + " para " + fmt(ult.mediana, cfg.tipo) + ".", novo: true });
+      }
+    });
+  });
+  return out;
+}
+function mostrarAlertas(id) {
+  var todos = alertasAtivos(), caixa = document.getElementById("fc-alertas");
+  document.querySelectorAll("#fc-abas button").forEach(function (b) {
+    b.classList.toggle("fc-tem-alerta", todos.some(function (a) { return a.id === b.dataset.id; }));
+  });
+  caixa.innerHTML = "";
+  todos.filter(function (a) { return a.id === id; }).forEach(function (a) {
+    var d = document.createElement("div"); d.className = "fc-alerta";
+    d.innerHTML = '<span class="fc-alerta-ic" aria-hidden="true">!</span><div><b></b><span></span></div>';
+    d.querySelector("b").textContent = a.titulo; d.querySelector("span:last-child").textContent = a.detalhe;
+    if (a.novo) { var e = document.createElement("em"); e.textContent = "NOVO"; d.querySelector("b").appendChild(e); }
+    caixa.appendChild(d);
+  });
+}
+function marcarMenu() {                // item do menu fica laranja quando há alerta
+  var n = alertasAtivos().length, item = document.getElementById("fc-chip");
+  item.classList.toggle("fc-com-alerta", n > 0);
+  var tag = item.querySelector(".fc-menu-alerta");
+  if (n && !tag) { tag = document.createElement("span"); tag.className = "fc-menu-alerta"; item.appendChild(tag); }
+  if (tag) { if (n) tag.textContent = n + (n > 1 ? " alertas" : " alerta"); else tag.remove(); }
+  item.title = n ? n + (n > 1 ? " alertas de virada no Focus" : " alerta de virada no Focus") : "";
+}
+
 // números sobem de zero até o valor da semana
 function contar(caixa, tipo) {
   if (calmo) return;
@@ -646,6 +856,7 @@ buscar("dados/focus.csv?v=" + Date.now())
     linhas = ls.map(function (l) { var c = l.split(","); return { indicador: c[i.ind], data: new Date(c[i.data]), ano: c[i.ano], mediana: parseFloat(c[i.med]) }; })
       .filter(function (l) { return !isNaN(l.mediana); });
     ultimaData = new Date(Math.max.apply(null, linhas.map(function (l) { return l.data; })));
+    marcarMenu();
     mostrar(atual);
   })
   .catch(function () {
@@ -660,6 +871,8 @@ buscar("dados/analises.json?v=" + Date.now())
     var lista = JSON.parse(t).filter(function (a) { return a && a.data && a.texto; })
       .sort(function (a, b) { return a.data < b.data ? 1 : -1; });
     if (!lista.length) return;
+    leituras = lista;
+    if (aberto && linhas.length) desenhar(atual, IND[atual]);
     document.getElementById("fc-leitura-data").textContent = "Focus de " + dataBR(lista[0].data);
     document.getElementById("fc-leitura-texto").textContent = lista[0].texto;
     document.getElementById("fc-leitura").hidden = false;
