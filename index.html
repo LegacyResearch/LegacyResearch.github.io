@@ -70,6 +70,25 @@
   footer { padding:40px 0 56px; font-size:14px; }
   footer p { color:var(--mut); }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .card, .det, .more i { transition:none; } }
+.fc-abas { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 20px; }
+.fc-abas button { min-height:42px; padding:0 20px; border-radius:999px; font:600 15px Inter, system-ui, sans-serif; border:1px solid #2A303A; color:var(--text); background:transparent; cursor:pointer; }
+.fc-abas button:hover { border-color:var(--acc); }
+.fc-abas button.ativa { background:var(--acc); border-color:var(--acc); color:#fff; }
+.fc-abas button:focus-visible { outline:2px solid var(--acc); outline-offset:3px; }
+.fc-numeros { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:20px; }
+.fc-card { background:var(--card); border-radius:14px; padding:22px 24px; }
+.fc-card .ano { font-size:13px; font-weight:600; letter-spacing:1px; color:var(--mut); text-transform:uppercase; }
+.fc-card .valor { font-family:'Space Grotesk', sans-serif; font-size:40px; font-weight:700; margin-top:4px; }
+.fc-card .var { font-size:14px; margin-top:2px; color:var(--mut); }
+.fc-sobe { color:#FF7A7A !important; } .fc-desce { color:#4ADE80 !important; }
+#focus figure { margin:0; }
+#focus figure img { width:100%; height:auto; border-radius:14px; border:1px solid var(--line); display:block; }
+#focus figcaption { font-size:13px; color:var(--mut); margin-top:10px; }
+.fc-leitura { border-top:3px solid var(--acc); padding-top:16px; margin-top:28px; }
+.fc-leitura h3 { font-family:'Space Grotesk', sans-serif; font-size:22px; margin:0 0 8px; }
+.fc-leitura p { white-space:pre-line; margin:0; }
+.fc-fonte { font-size:13px; color:var(--mut); margin:16px 0 0; }
+.fc-fonte a { color:var(--acc); }
 </style>
 </head>
 <body>
@@ -91,6 +110,7 @@
     <p class="lead">Laboratório independente de pesquisa macroeconômica. Juros, inflação, atividade, contas públicas e câmbio, no Brasil e no mundo.</p>
     <div class="btns">
       <a class="btn primary" href="https://www.linkedin.com/company/legacyresearch/" target="_blank" rel="noopener">Siga no LinkedIn</a>
+<a class="btn" href="#focus">Boletim Focus</a>
       <a class="btn" href="https://github.com/LegacyResearch" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="margin-right:8px"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
     </div>
   </div>
@@ -155,6 +175,30 @@
       </button>
     </div>
   </div>
+</section>
+
+<section id="focus">
+<div class="wrap">
+<p class="kick">PAINEL · ATUALIZAÇÃO AUTOMÁTICA</p>
+<h2>Boletim Focus</h2>
+<p style="margin-bottom:24px">O que o mercado espera para a economia brasileira, com dados do Banco Central. Este painel se atualiza sozinho toda segunda-feira.</p>
+<div class="fc-abas" id="fc-abas" role="group" aria-label="Escolha o indicador">
+<button type="button" data-id="ipca">IPCA</button>
+<button type="button" data-id="selic">Selic</button>
+<button type="button" data-id="cambio">Câmbio</button>
+<button type="button" data-id="pib">PIB</button>
+</div>
+<div class="fc-numeros" id="fc-numeros"><div class="fc-card"><div class="ano">Carregando os dados…</div></div></div>
+<figure>
+<img id="fc-grafico" src="graficos/ipca_focus.png" alt="Gráfico das projeções do Boletim Focus" loading="lazy">
+<figcaption id="fc-legenda"></figcaption>
+</figure>
+<div class="fc-leitura" id="fc-leitura" hidden>
+<h3>Leitura da semana</h3>
+<p id="fc-leitura-texto"></p>
+</div>
+<p class="fc-fonte">Fonte: <a href="https://www.bcb.gov.br/publicacoes/focus" target="_blank" rel="noopener">Banco Central do Brasil – Boletim Focus</a>. Projeções medianas do mercado.</p>
+</div>
 </section>
 
 <footer>
@@ -370,6 +414,74 @@ document.querySelectorAll('.card').forEach(function (c) {
   } else {
     requestAnimationFrame(frame);
   }
+})();
+</script>
+<script>
+// Painel do Boletim Focus: lê dados/focus.csv e graficos/*.png, gerados toda segunda pelo robô do GitHub Actions
+(function () {
+var IND = {
+  ipca:   { nome: "IPCA",      titulo: "IPCA",                imagem: "ipca_focus.png",   tipo: "pct",
+            legenda: "Projeção mediana do IPCA (%). Faixa clara: intervalo da meta de inflação (1,5% a 4,5%)." },
+  selic:  { nome: "Selic",     titulo: "Selic no fim do ano", imagem: "selic_focus.png",  tipo: "pct",
+            legenda: "Projeção mediana da taxa Selic no fim de cada ano (% ao ano)." },
+  cambio: { nome: "Câmbio",    titulo: "Dólar no fim do ano", imagem: "cambio_focus.png", tipo: "real",
+            legenda: "Projeção mediana do dólar no fim de cada ano (R$ por US$)." },
+  pib:    { nome: "PIB Total", titulo: "PIB",                 imagem: "pib_focus.png",    tipo: "pct",
+            legenda: "Projeção mediana do crescimento do PIB (%)." }
+};
+var linhas = [], ultimaData = null;
+function fmt(v, tipo) { var n = v.toFixed(2).replace(".", ","); return tipo === "real" ? "R$ " + n : n + "%"; }
+function mostrar(id) {
+  var cfg = IND[id] || IND.ipca;
+  document.querySelectorAll("#fc-abas button").forEach(function (b) {
+    var on = b.dataset.id === id; b.classList.toggle("ativa", on); b.setAttribute("aria-pressed", on);
+  });
+  var img = document.getElementById("fc-grafico");
+  img.src = "graficos/" + cfg.imagem + "?v=" + (ultimaData ? ultimaData.getTime() : Date.now());
+  img.alt = "Gráfico das projeções do Boletim Focus para " + cfg.titulo;
+  var leg = cfg.legenda;
+  if (ultimaData) leg += " Atualizado em " + ultimaData.toLocaleDateString("pt-BR", { timeZone: "UTC" }) + ".";
+  document.getElementById("fc-legenda").textContent = leg;
+  var caixa = document.getElementById("fc-numeros");
+  var dados = linhas.filter(function (l) { return l.indicador === cfg.nome; });
+  if (!dados.length) { caixa.innerHTML = '<div class="fc-card"><div class="ano">Ainda não há dados para este indicador.</div></div>'; return; }
+  caixa.innerHTML = "";
+  Array.from(new Set(dados.map(function (l) { return l.ano; }))).sort().forEach(function (ano) {
+    var serie = dados.filter(function (l) { return l.ano === ano; }).sort(function (a, b) { return a.data - b.data; });
+    var ult = serie[serie.length - 1];
+    var antes = serie.filter(function (l) { return l.data <= new Date(ult.data - 7 * 864e5); }).pop();
+    var txt = "", cls = "";
+    if (antes) {
+      var d = ult.mediana - antes.mediana;
+      var val = cfg.tipo === "real" ? "R$ " + Math.abs(d).toFixed(2).replace(".", ",") : Math.abs(d).toFixed(2).replace(".", ",") + " p.p.";
+      txt = Math.abs(d) < 0.005 ? "sem mudança na semana" : (d > 0 ? "▲ " : "▼ ") + val + " na semana";
+      cls = Math.abs(d) < 0.005 ? "" : (d > 0 ? "fc-sobe" : "fc-desce");
+    }
+    caixa.insertAdjacentHTML("beforeend", '<div class="fc-card"><div class="ano">' + cfg.titulo + " · " + ano +
+      '</div><div class="valor">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div></div>");
+  });
+}
+document.querySelectorAll("#fc-abas button").forEach(function (b) {
+  b.addEventListener("click", function () { mostrar(b.dataset.id); });
+});
+fetch("dados/focus.csv?v=" + Date.now())
+  .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+  .then(function (t) {
+    var ls = t.trim().split("\n"), col = ls.shift().split(",");
+    var i = { ind: col.indexOf("Indicador"), data: col.indexOf("Data"), ano: col.indexOf("DataReferencia"), med: col.indexOf("Mediana") };
+    linhas = ls.map(function (l) { var c = l.split(","); return { indicador: c[i.ind], data: new Date(c[i.data]), ano: c[i.ano], mediana: parseFloat(c[i.med]) }; })
+      .filter(function (l) { return !isNaN(l.mediana); });
+    ultimaData = new Date(Math.max.apply(null, linhas.map(function (l) { return l.data; })));
+    mostrar("ipca");
+  })
+  .catch(function () {
+    document.getElementById("fc-numeros").innerHTML = '<div class="fc-card"><div class="ano">Os dados aparecem aqui depois da primeira atualização.</div></div>';
+    mostrar("ipca");
+  });
+fetch("leitura.txt?v=" + Date.now())
+  .then(function (r) { return r.ok ? r.text() : ""; })
+  .then(function (t) { t = t.trim(); if (!t) return; document.getElementById("fc-leitura-texto").textContent = t; document.getElementById("fc-leitura").hidden = false; })
+  .catch(function () {});
 })();
 </script>
 </body>
