@@ -89,6 +89,65 @@
 .fc-leitura p { white-space:pre-line; margin:0; }
 .fc-fonte { font-size:13px; color:var(--mut); margin:16px 0 0; }
 .fc-fonte a { color:var(--acc); }
+
+/* ---------- topo: marca + indicador "ao vivo" do Focus ---------- */
+.topo { display:flex; flex-direction:column; align-items:flex-start; gap:14px; margin-bottom:clamp(24px, 5vh, 56px); }
+.topo .brand { margin-bottom:0; }
+/* cabeçalho: espaço para novos itens no futuro (é só repetir o <a class="menu-item">) */
+.menu { display:flex; flex-wrap:wrap; gap:4px 22px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); }
+.menu-item { position:relative; display:inline-flex; align-items:center; gap:9px; padding:4px 0; font:600 14px Inter, system-ui, sans-serif; color:var(--sub); text-decoration:none; transition:color .2s ease; }
+.menu-item::after { content:""; position:absolute; left:0; right:0; bottom:-2px; height:2px; background:var(--acc); transform:scaleX(0); transform-origin:left; transition:transform .25s ease; }
+.menu-item:hover { color:var(--text); }
+.menu-item:hover::after { transform:scaleX(1); }
+.menu-item:focus-visible { outline:2px solid var(--acc); outline-offset:4px; border-radius:2px; }
+.fc-pulso { position:relative; width:8px; height:8px; border-radius:50%; background:#4ADE80; flex:none; }
+.fc-pulso::after { content:""; position:absolute; inset:0; border-radius:50%; background:#4ADE80; animation:fc-pulso 1.8s ease-out infinite; }
+@keyframes fc-pulso { from { transform:scale(1); opacity:.7; } to { transform:scale(3); opacity:0; } }
+
+/* ---------- cortina azul da transição ---------- */
+.fc-cortina { position:fixed; inset:0; z-index:100; background:var(--acc); visibility:hidden; pointer-events:none;
+  clip-path:circle(0px at var(--x, 50%) var(--y, 0%)); display:flex; align-items:center; justify-content:center; }
+.fc-cortina.abrindo { visibility:visible; clip-path:circle(150vmax at var(--x, 50%) var(--y, 0%)); transition:clip-path .65s cubic-bezier(.7,0,.25,1); }
+.fc-cortina.saindo { visibility:visible; clip-path:circle(150vmax at var(--x, 50%) var(--y, 0%)); transform:translateY(-100%); transition:transform .6s cubic-bezier(.7,0,.25,1); }
+.fc-cortina-marca { display:flex; flex-direction:column; align-items:center; gap:14px; color:#fff; opacity:0; transform:translateY(12px) scale(.96); transition:opacity .3s ease, transform .3s ease; }
+.fc-cortina.marca .fc-cortina-marca { opacity:1; transform:none; }
+.fc-cortina-marca span { font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(22px, 4vw, 34px); letter-spacing:6px; }
+.fc-barra { display:block; width:160px; height:3px; background:rgba(255,255,255,.3); border-radius:3px; overflow:hidden; }
+.fc-barra b { display:block; height:100%; width:0; background:#fff; }
+.fc-cortina.marca .fc-barra b { width:100%; transition:width .6s cubic-bezier(.5,0,.2,1) .1s; }
+
+/* ---------- tela própria do painel ---------- */
+.fc-tela { position:fixed; inset:0; z-index:90; background:var(--bg); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.fc-tela[hidden] { display:none; }
+.fc-tela::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.5;
+  background-image:linear-gradient(#1A2130 1px, transparent 1px), linear-gradient(90deg, #1A2130 1px, transparent 1px); background-size:48px 48px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%); mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 70%); }
+.fc-tela.fechando { opacity:0; transform:translateY(16px); transition:opacity .28s ease, transform .28s ease; }
+.fc-barra-topo { position:sticky; top:0; z-index:2; background:rgba(11,13,16,.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+.fc-barra-topo-in { display:flex; align-items:center; justify-content:space-between; min-height:64px; }
+.fc-marca-mini { display:flex; align-items:center; gap:10px; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:17px; }
+.fc-fechar { display:inline-flex; align-items:center; gap:10px; min-height:40px; padding:0 16px; border-radius:999px; border:1px solid #2A303A; background:transparent; color:var(--text);
+  font:600 14px Inter, system-ui, sans-serif; cursor:pointer; }
+.fc-fechar:hover { border-color:var(--acc); }
+.fc-fechar:focus-visible { outline:2px solid var(--acc); outline-offset:3px; }
+.fc-conteudo { position:relative; padding-top:48px; padding-bottom:64px; }
+
+/* entrada escalonada dos elementos */
+.fc-in { opacity:0; transform:translateY(18px); }
+.fc-tela.ativa .fc-in { opacity:1; transform:none; transition:opacity .5s ease, transform .5s cubic-bezier(.2,.7,.2,1); }
+.fc-tela.ativa .fc-in:nth-child(1) { transition-delay:.05s; } .fc-tela.ativa .fc-in:nth-child(2) { transition-delay:.12s; }
+.fc-tela.ativa .fc-in:nth-child(3) { transition-delay:.19s; } .fc-tela.ativa .fc-in:nth-child(4) { transition-delay:.26s; }
+.fc-tela.ativa figure.fc-in { transition-delay:.4s; }
+.fc-card { animation:fc-sobe-card .5s cubic-bezier(.2,.7,.2,1) both; }
+.fc-card:nth-child(2) { animation-delay:.08s; }
+@keyframes fc-sobe-card { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+#fc-grafico { clip-path:inset(0 100% 0 0); }
+#fc-grafico.revela { clip-path:inset(0 0 0 0); transition:clip-path 1s cubic-bezier(.5,0,.2,1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-cortina { display:none; } .fc-in, .fc-tela.ativa .fc-in { opacity:1; transform:none; transition:none; }
+  .fc-card { animation:none; } #fc-grafico, #fc-grafico.revela { clip-path:none; transition:none; } .fc-pulso::after { animation:none; }
+}
 </style>
 </head>
 <body>
@@ -96,6 +155,7 @@
 <header class="hero">
   <canvas id="scene" aria-hidden="true"></canvas>
   <div class="wrap hero-inner">
+    <div class="topo">
     <div class="brand">
       <svg width="42" height="42" viewBox="0 0 100 100" role="img" aria-label="Logo Legacy Research">
         <polygon points="30,12 40,27 58,24 73,31 88,43 93,50 87,58 73,64 54,70 38,90 16,84 18,44 23,29" fill="#3D7BFF"/>
@@ -106,11 +166,14 @@
       </svg>
       <span>Legacy <span class="acc">Research</span></span>
     </div>
+    <nav class="menu" aria-label="Navegação principal">
+      <a href="#focus" id="fc-chip" class="menu-item"><i class="fc-pulso" aria-hidden="true"></i>Análise do Focus</a>
+    </nav>
+    </div>
     <h1>Dados. Método aberto. Erros à vista.</h1>
     <p class="lead">Laboratório independente de pesquisa macroeconômica. Juros, inflação, atividade, contas públicas e câmbio, no Brasil e no mundo.</p>
     <div class="btns">
       <a class="btn primary" href="https://www.linkedin.com/company/legacyresearch/" target="_blank" rel="noopener">Siga no LinkedIn</a>
-<a class="btn" href="#focus">Boletim Focus</a>
       <a class="btn" href="https://github.com/LegacyResearch" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="margin-right:8px"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
     </div>
   </div>
@@ -177,20 +240,34 @@
   </div>
 </section>
 
-<section id="focus">
-<div class="wrap">
-<p class="kick">PAINEL · ATUALIZAÇÃO AUTOMÁTICA</p>
-<h2>Boletim Focus</h2>
-<p style="margin-bottom:24px">O que o mercado espera para a economia brasileira, com dados do Banco Central. Este painel se atualiza sozinho toda segunda-feira.</p>
-<div class="fc-abas" id="fc-abas" role="group" aria-label="Escolha o indicador">
+<div class="fc-cortina" id="fc-cortina" aria-hidden="true">
+<div class="fc-cortina-marca">
+<svg width="64" height="64" viewBox="0 0 100 100"><polygon points="30,12 40,27 58,24 73,31 88,43 93,50 87,58 73,64 54,70 38,90 16,84 18,44 23,29" fill="#fff"/><polygon points="66,37 77,39 72,43" fill="#3D7BFF"/><polygon points="87,44 94,50 87,52" fill="#3D7BFF"/></svg>
+<span>ANÁLISE DO FOCUS</span>
+<i class="fc-barra"><b></b></i>
+</div>
+</div>
+
+<div id="focus" class="fc-tela" role="dialog" aria-modal="true" aria-labelledby="fc-titulo" hidden>
+<div class="fc-barra-topo">
+<div class="wrap fc-barra-topo-in">
+<span class="fc-marca-mini"><svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true"><polygon points="30,12 40,27 58,24 73,31 88,43 93,50 87,58 73,64 54,70 38,90 16,84 18,44 23,29" fill="#3D7BFF"/></svg>Legacy <span class="acc">Research</span></span>
+<button type="button" class="fc-fechar" id="fc-fechar">Voltar ao site <span aria-hidden="true">✕</span></button>
+</div>
+</div>
+<div class="wrap fc-conteudo">
+<p class="kick fc-in">BOLETIM FOCUS · ATUALIZAÇÃO AUTOMÁTICA</p>
+<h2 class="fc-in" id="fc-titulo">Análise do Focus</h2>
+<p class="fc-in" style="margin-bottom:24px">O que o mercado espera para a economia brasileira, com dados do Banco Central. Este painel se atualiza sozinho toda segunda-feira.</p>
+<div class="fc-abas fc-in" id="fc-abas" role="group" aria-label="Escolha o indicador">
 <button type="button" data-id="ipca">IPCA</button>
 <button type="button" data-id="selic">Selic</button>
 <button type="button" data-id="cambio">Câmbio</button>
 <button type="button" data-id="pib">PIB</button>
 </div>
 <div class="fc-numeros" id="fc-numeros"><div class="fc-card"><div class="ano">Carregando os dados…</div></div></div>
-<figure>
-<img id="fc-grafico" src="graficos/ipca_focus.png" alt="Gráfico das projeções do Boletim Focus" loading="lazy">
+<figure class="fc-in">
+<img id="fc-grafico" src="graficos/ipca_focus.png" alt="Gráfico das projeções do Boletim Focus">
 <figcaption id="fc-legenda"></figcaption>
 </figure>
 <div class="fc-leitura" id="fc-leitura" hidden>
@@ -199,7 +276,7 @@
 </div>
 <p class="fc-fonte">Fonte: <a href="https://www.bcb.gov.br/publicacoes/focus" target="_blank" rel="noopener">Banco Central do Brasil – Boletim Focus</a>. Projeções medianas do mercado.</p>
 </div>
-</section>
+</div>
 
 <footer>
   <div class="wrap">
@@ -429,7 +506,17 @@ var IND = {
   pib:    { nome: "PIB Total", titulo: "PIB",                 imagem: "pib_focus.png",    tipo: "pct",
             legenda: "Projeção mediana do crescimento do PIB (%)." }
 };
-var linhas = [], ultimaData = null;
+var linhas = [], ultimaData = null, atual = "ipca";
+// onde procurar dados e gráficos: primeiro ao lado da página, depois o site publicado, depois o repositório.
+// Assim o painel funciona no GitHub Pages, abrindo o arquivo no computador e em prévias.
+var BASES = ["", "https://legacyresearch.github.io/", "https://raw.githubusercontent.com/LegacyResearch/LegacyResearch.github.io/main/"];
+function buscar(caminho, i) {
+  i = i || 0;
+  return fetch(BASES[i] + caminho, { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .catch(function (e) { if (i + 1 < BASES.length) return buscar(caminho, i + 1); throw e; });
+}
+var calmo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function fmt(v, tipo) { var n = v.toFixed(2).replace(".", ","); return tipo === "real" ? "R$ " + n : n + "%"; }
 function mostrar(id) {
   var cfg = IND[id] || IND.ipca;
@@ -437,7 +524,16 @@ function mostrar(id) {
     var on = b.dataset.id === id; b.classList.toggle("ativa", on); b.setAttribute("aria-pressed", on);
   });
   var img = document.getElementById("fc-grafico");
-  img.src = "graficos/" + cfg.imagem + "?v=" + (ultimaData ? ultimaData.getTime() : Date.now());
+  img.classList.remove("revela");
+  var tentativa = 0, sufixo = "graficos/" + cfg.imagem + "?v=" + (ultimaData ? ultimaData.getTime() : Date.now());
+  img.onload = function () { requestAnimationFrame(function () { requestAnimationFrame(function () { img.classList.add("revela"); }); }); };
+  img.onerror = function () {          // não achou ao lado do site? tenta o endereço público
+    tentativa++;
+    if (tentativa < BASES.length) img.src = BASES[tentativa] + sufixo;
+    else { img.classList.add("revela"); img.alt = "Não foi possível carregar o gráfico agora."; }
+  };
+  img.src = BASES[0] + sufixo;
+  if (img.complete && img.naturalWidth) img.onload();
   img.alt = "Gráfico das projeções do Boletim Focus para " + cfg.titulo;
   var leg = cfg.legenda;
   if (ultimaData) leg += " Atualizado em " + ultimaData.toLocaleDateString("pt-BR", { timeZone: "UTC" }) + ".";
@@ -458,28 +554,90 @@ function mostrar(id) {
       cls = Math.abs(d) < 0.005 ? "" : (d > 0 ? "fc-sobe" : "fc-desce");
     }
     caixa.insertAdjacentHTML("beforeend", '<div class="fc-card"><div class="ano">' + cfg.titulo + " · " + ano +
-      '</div><div class="valor">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div></div>");
+      '</div><div class="valor" data-v="' + ult.mediana + '">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div></div>");
   });
+  contar(caixa, cfg.tipo);
+}
+// números sobem de zero até o valor da semana
+function contar(caixa, tipo) {
+  if (calmo) return;
+  var els = caixa.querySelectorAll(".valor[data-v]"), t0 = performance.now(), DUR = 900;
+  function passo(t) {
+    var p = Math.min(1, (t - t0) / DUR), e = 1 - Math.pow(1 - p, 3);
+    els.forEach(function (el) { el.textContent = fmt(parseFloat(el.dataset.v) * e, tipo); });
+    if (p < 1) requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
 }
 document.querySelectorAll("#fc-abas button").forEach(function (b) {
-  b.addEventListener("click", function () { mostrar(b.dataset.id); });
+  b.addEventListener("click", function () { atual = b.dataset.id; mostrar(atual); });
 });
-fetch("dados/focus.csv?v=" + Date.now())
-  .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+
+// ---------- abrir e fechar a tela do Focus ----------
+var tela = document.getElementById("focus"), cortina = document.getElementById("fc-cortina"),
+    chip = document.getElementById("fc-chip"), aberto = false, ocupado = false;
+function travarRolagem(on) { document.documentElement.style.overflow = on ? "hidden" : ""; }
+function mostrarTela() {
+  tela.hidden = false; tela.scrollTop = 0; travarRolagem(true);
+  void tela.offsetWidth; tela.classList.add("ativa");
+  mostrar(atual);
+  document.getElementById("fc-fechar").focus({ preventScroll: true });
+}
+function abrir(x, y, comHistorico) {
+  if (aberto || ocupado) return;
+  aberto = true;
+  if (comHistorico) { try { history.pushState({ focus: true }, "", "#focus"); } catch (e) {} } // algumas prévias bloqueiam o histórico
+  if (calmo) { mostrarTela(); return; }
+  ocupado = true;
+  cortina.style.setProperty("--x", x + "px"); cortina.style.setProperty("--y", y + "px");
+  cortina.className = "fc-cortina"; void cortina.offsetWidth;
+  cortina.classList.add("abrindo");                                    // 1. círculo azul cresce a partir do botão
+  setTimeout(function () { cortina.classList.add("marca"); }, 450);   // 2. marca + barra de carregamento
+  setTimeout(function () {                                             // 3. cortina sobe e revela o painel
+    mostrarTela();
+    cortina.classList.remove("abrindo"); cortina.classList.add("saindo");
+  }, 1250);
+  setTimeout(function () { cortina.className = "fc-cortina"; ocupado = false; }, 1900);
+}
+function fechar(viaHistorico) {
+  if (!aberto) return;
+  if (!viaHistorico && history.state && history.state.focus && location.hash === "#focus") { history.back(); return; } // o popstate fecha
+  aberto = false;
+  if (!viaHistorico) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+  tela.classList.add("fechando");
+  setTimeout(function () {
+    tela.hidden = true; tela.classList.remove("ativa", "fechando"); travarRolagem(false);
+    chip.focus({ preventScroll: true });
+  }, calmo ? 0 : 280);
+}
+chip.addEventListener("click", function (e) {
+  e.preventDefault();
+  var r = chip.getBoundingClientRect();
+  abrir(r.left + r.width / 2, r.top + r.height / 2, true);
+});
+document.getElementById("fc-fechar").addEventListener("click", function () { fechar(false); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && aberto) fechar(false); });
+window.addEventListener("popstate", function () {
+  if (location.hash === "#focus") abrir(window.innerWidth / 2, 0, false);
+  else if (aberto) fechar(true);
+});
+// link direto (legacyresearch.github.io/#focus) já abre o painel
+if (location.hash === "#focus") { abrir(window.innerWidth / 2, 0, false); }
+buscar("dados/focus.csv?v=" + Date.now())
   .then(function (t) {
     var ls = t.trim().split("\n"), col = ls.shift().split(",");
     var i = { ind: col.indexOf("Indicador"), data: col.indexOf("Data"), ano: col.indexOf("DataReferencia"), med: col.indexOf("Mediana") };
     linhas = ls.map(function (l) { var c = l.split(","); return { indicador: c[i.ind], data: new Date(c[i.data]), ano: c[i.ano], mediana: parseFloat(c[i.med]) }; })
       .filter(function (l) { return !isNaN(l.mediana); });
     ultimaData = new Date(Math.max.apply(null, linhas.map(function (l) { return l.data; })));
-    mostrar("ipca");
+    mostrar(atual);
   })
   .catch(function () {
     document.getElementById("fc-numeros").innerHTML = '<div class="fc-card"><div class="ano">Os dados aparecem aqui depois da primeira atualização.</div></div>';
-    mostrar("ipca");
+    mostrar(atual);
   });
-fetch("leitura.txt?v=" + Date.now())
-  .then(function (r) { return r.ok ? r.text() : ""; })
+buscar("leitura.txt?v=" + Date.now())
+  .catch(function () { return ""; })
   .then(function (t) { t = t.trim(); if (!t) return; document.getElementById("fc-leitura-texto").textContent = t; document.getElementById("fc-leitura").hidden = false; })
   .catch(function () {});
 })();
