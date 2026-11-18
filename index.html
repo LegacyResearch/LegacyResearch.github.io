@@ -87,6 +87,17 @@
 .fc-leitura { border-top:3px solid var(--acc); padding-top:16px; margin-top:28px; }
 .fc-leitura h3 { font-family:'Space Grotesk', sans-serif; font-size:22px; margin:0 0 8px; }
 .fc-leitura p { white-space:pre-line; margin:0; }
+.fc-leitura p.fc-leitura-data { font-size:13px; font-weight:600; letter-spacing:2px; color:var(--acc); margin:0 0 6px; text-transform:uppercase; }
+.fc-antigas { margin-top:22px; border-top:1px solid var(--line); padding-top:14px; }
+.fc-antigas summary { cursor:pointer; font-weight:600; font-size:14px; color:var(--sub); list-style:none; display:inline-flex; align-items:center; gap:8px; }
+.fc-antigas summary::-webkit-details-marker { display:none; }
+.fc-antigas summary::before { content:"+"; color:var(--acc); font-size:18px; line-height:1; transition:transform .25s ease; }
+.fc-antigas[open] summary::before { transform:rotate(45deg); }
+.fc-antigas summary:hover { color:var(--text); }
+.fc-antiga { padding:14px 0; border-bottom:1px solid var(--line); }
+.fc-antiga:last-child { border-bottom:0; }
+.fc-antiga b { display:block; font-size:12px; letter-spacing:2px; color:var(--mut); margin-bottom:4px; text-transform:uppercase; }
+.fc-antiga p { font-size:15px; }
 .fc-fonte { font-size:13px; color:var(--mut); margin:16px 0 0; }
 .fc-fonte a { color:var(--acc); }
 
@@ -271,8 +282,13 @@
 <figcaption id="fc-legenda"></figcaption>
 </figure>
 <div class="fc-leitura" id="fc-leitura" hidden>
+<p class="fc-leitura-data" id="fc-leitura-data"></p>
 <h3>Leitura da semana</h3>
 <p id="fc-leitura-texto"></p>
+<details class="fc-antigas" id="fc-antigas" hidden>
+<summary>Semanas anteriores</summary>
+<div id="fc-antigas-lista"></div>
+</details>
 </div>
 <p class="fc-fonte">Fonte: <a href="https://www.bcb.gov.br/publicacoes/focus" target="_blank" rel="noopener">Banco Central do Brasil – Boletim Focus</a>. Projeções medianas do mercado.</p>
 </div>
@@ -636,9 +652,28 @@ buscar("dados/focus.csv?v=" + Date.now())
     document.getElementById("fc-numeros").innerHTML = '<div class="fc-card"><div class="ano">Os dados aparecem aqui depois da primeira atualização.</div></div>';
     mostrar(atual);
   });
-buscar("leitura.txt?v=" + Date.now())
-  .catch(function () { return ""; })
-  .then(function (t) { t = t.trim(); if (!t) return; document.getElementById("fc-leitura-texto").textContent = t; document.getElementById("fc-leitura").hidden = false; })
+// Leitura da semana: dados/analises.json, lista [{ "data": "AAAA-MM-DD", "texto": "..." }].
+// A mais recente aparece em destaque; as outras ficam em "Semanas anteriores".
+function dataBR(iso) { var d = iso.split("-"); return d[2] + "/" + d[1] + "/" + d[0]; }
+buscar("dados/analises.json?v=" + Date.now())
+  .then(function (t) {
+    var lista = JSON.parse(t).filter(function (a) { return a && a.data && a.texto; })
+      .sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+    if (!lista.length) return;
+    document.getElementById("fc-leitura-data").textContent = "Focus de " + dataBR(lista[0].data);
+    document.getElementById("fc-leitura-texto").textContent = lista[0].texto;
+    document.getElementById("fc-leitura").hidden = false;
+    var antigas = lista.slice(1);
+    if (!antigas.length) return;
+    var caixa = document.getElementById("fc-antigas-lista");
+    antigas.forEach(function (a) {
+      var div = document.createElement("div"); div.className = "fc-antiga";
+      var b = document.createElement("b"); b.textContent = "Focus de " + dataBR(a.data);
+      var p = document.createElement("p"); p.textContent = a.texto;
+      div.appendChild(b); div.appendChild(p); caixa.appendChild(div);
+    });
+    document.getElementById("fc-antigas").hidden = false;
+  })
   .catch(function () {});
 })();
 </script>
