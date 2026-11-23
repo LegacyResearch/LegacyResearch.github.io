@@ -586,7 +586,7 @@ var IND = {
   cambio: { nome: "Câmbio",    titulo: "Dólar no fim do ano", imagem: "cambio_focus.png", tipo: "real",
             legenda: "Projeção mediana do dólar no fim de cada ano (R$ por US$).", escalaMin: 1 },
   pib:    { nome: "PIB Total", titulo: "PIB",                 imagem: "pib_focus.png",    tipo: "pct",
-            legenda: "Projeção mediana do crescimento do PIB (%).", escalaMin: 2 }
+            legenda: "Projeção mediana do crescimento do PIB (%).", escalaMin: 2, altaBoa: true }
 };
 var leituras = [], grafico = null;
 var linhas = [], ultimaData = null, atual = "ipca";
@@ -623,7 +623,9 @@ function mostrar(id) {
       var d = ult.mediana - antes.mediana;
       var val = cfg.tipo === "real" ? "R$ " + Math.abs(d).toFixed(2).replace(".", ",") : Math.abs(d).toFixed(2).replace(".", ",") + " p.p.";
       txt = Math.abs(d) < 0.005 ? "sem mudança na semana" : (d > 0 ? "▲ " : "▼ ") + val + " na semana";
-      cls = Math.abs(d) < 0.005 ? "" : (d > 0 ? "fc-sobe" : "fc-desce");
+      // cor: vermelho quando piora, verde quando melhora (no PIB, subir é bom; nos outros, cair é bom)
+      var melhorou = cfg.altaBoa ? d > 0 : d < 0;
+      cls = Math.abs(d) < 0.005 ? "" : (melhorou ? "fc-desce" : "fc-sobe");
     }
     caixa.insertAdjacentHTML("beforeend", '<div class="fc-card"><div class="ano">' + cfg.titulo + " · " + ano +
       '</div><div class="valor" data-v="' + ult.mediana + '">' + fmt(ult.mediana, cfg.tipo) + '</div><div class="var ' + cls + '">' + txt + "</div></div>");
